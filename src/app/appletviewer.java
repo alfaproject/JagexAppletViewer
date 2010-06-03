@@ -69,81 +69,66 @@ public final class appletviewer
 		var_1f60.clear();
 		LanguageStrings.Load();
 		var_1f28.clear();
-		Object localObject = null;
 		int k = 0;
+
+		BufferedReader localBufferedReader = null;
 		try {
-			String str4;
-			BufferedReader localBufferedReader = sub_2562();
+			localBufferedReader = getConfigReader();
+			String configLine = null;
+			while ((configLine = localBufferedReader.readLine()) != null) {
+				configLine = configLine.trim();
 
-			do {
-				do {
-					localObject = localBufferedReader.readLine();
-					if (localObject == null) {
-						//break label469;
-						break;
-					}
+				if (configLine.startsWith("//") || configLine.startsWith("#")) {
+					// ignore line comments
+					continue;
+				} else if (configLine.startsWith("msg=")) {
+					// language string
+					configLine = configLine.substring(4);
 
-					localObject = ((String)localObject).trim();
-				} while ((((String)localObject).startsWith("//")) || (((String)localObject).startsWith("#")));
-
-				if (!((String)localObject).startsWith("param=")) {
-					String str2;
-					if (((String)localObject).startsWith("msg=")) {
-						localObject = ((String)localObject).substring(4);
-
-						k = ((String)localObject).indexOf('=');
-						if (0 != (k ^ 0xFFFFFFFF)) {
-							str2 = ((String)localObject).substring(0, k).trim().toLowerCase();
-							str4 = ((String)localObject).substring(k + 1).trim();
-							if (str2.startsWith("lang")) {
-								try {
-									Integer.parseInt(str2.substring(4));
-									++i;
-								} catch (NumberFormatException localNumberFormatException2) {
-								}
-							}
-							LanguageStrings.Set(str2, str4);
-							if (debug) {
-								System.out.println("Message - name=" + str2 + " text=" + str4);
+					k = configLine.indexOf('=');
+					if (k != -1) {
+						String name = configLine.substring(0, k).trim().toLowerCase();
+						String value = configLine.substring(k + 1).trim();
+						if (name.startsWith("lang")) {
+							try {
+								Integer.parseInt(name.substring(4));
+								i++;
+							} catch (NumberFormatException ex) {
 							}
 						}
-
-						if (!bool) {
-							continue;
-						}
-					}
-					k = ((String)localObject).indexOf('=');
-					if (-1 != k) {
-						str2 = ((String)localObject).substring(0, k).trim().toLowerCase();
-
-						str4 = ((String)localObject).substring(k - -1).trim();
-						var_1f28.put(str2, str4);
+						LanguageStrings.Set(name, value);
 						if (debug) {
-							System.out.println("Ourconfig - variable=" + str2 + " value=" + str4);
+							System.out.println("Message - name=" + name + " text=" + value);
 						}
 					}
-
-					if (!bool) {
+				} else if (configLine.startsWith("param=")) {
+					// config parameter
+					configLine = configLine.substring(6);
+					k = configLine.indexOf('=');
+					if (k != -1) {
+						String name = configLine.substring(0, k).trim().toLowerCase();
+						String value = configLine.substring(k + 1).trim();
+						var_1f28.put(name, value);
+						if (debug) {
+							System.out.println("Ourconfig - variable=" + name + " value=" + value);
+						}
+					}
+				} else {
+					// other config variables
+					k = configLine.indexOf('=');
+					if (k == -1) {
+						// ignore invalid lines
 						continue;
 					}
+
+					String name = configLine.substring(0, k).trim().toLowerCase();
+					String value = configLine.substring(k + 1).trim();
+					var_1f60.put(name, value);
+					if (debug) {
+						System.out.println("Innerconfig - variable=" + name + " value=" + value);
+					}
 				}
-				localObject = ((String)localObject).substring(6);
-
-				k = ((String)localObject).indexOf('=');
-				if (k == -1) {
-					continue;
-				}
-				String str2 = ((String)localObject).substring(0, k).trim().toLowerCase();
-
-				str4 = ((String)localObject).substring(k + 1).trim();
-				var_1f60.put(str2, str4);
-				if (!debug)
-					continue;
-				System.out.println("Innerconfig - variable=" + str2 + " value=" + str4);
-			} while (!bool);
-
-			label469:
-			localBufferedReader.close();
+			}
 		} catch (IOException localIOException) {
 			if (debug) {
 				localIOException.printStackTrace();
@@ -154,7 +139,15 @@ public final class appletviewer
 				localException.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_decode_config"));
+		} finally {
+			if (localBufferedReader != null) {
+				try {
+					localBufferedReader.close();
+				} catch (IOException ex) {
+				}
+			}
 		}
+
 		if (0 < i) {
 			var_1f88 = new int[i];
 			languageNames = new String[i];
@@ -166,7 +159,7 @@ public final class appletviewer
 						//break label729;
 						break;
 					}
-					localObject = (String)localEnumeration.nextElement();
+					Object localObject = (String)localEnumeration.nextElement();
 					if (!((String)localObject).startsWith("lang")) {
 						//break label724;
 						break;
@@ -179,6 +172,7 @@ public final class appletviewer
 				} while (!bool);
 
 				int str1 = 0;
+				Object localObject = null;
 				for (int str3 = 0; str3 < str1; str3++) {
 					if (((str3 ^ 0xFFFFFFFF) == (str1 ^ 0xFFFFFFFF)) || (var_1f88[str3] > k)) {
 						for (int str4 = str1; str4 > str3; str4--) {
@@ -201,7 +195,7 @@ public final class appletviewer
 			DialogLanguage.Create();
 			var_1f38 = new MenuBar();
 
-			localObject = new Menu(LanguageStrings.Get("options"));
+			Object localObject = new Menu(LanguageStrings.Get("options"));
 
 			MenuItem localMenuItem = new MenuItem(LanguageStrings.Get("language") + "...");
 			Class_f localClass_f = new Class_f();
@@ -221,11 +215,10 @@ public final class appletviewer
   {
   }
 
-	private static final BufferedReader sub_2562() throws IOException {
+	private static final BufferedReader getConfigReader() throws IOException {
 		if (_configUrl != null) {
 			return new BufferedReader(new InputStreamReader(new URL(_configUrl).openStream()));
 		}
-
 		return new BufferedReader(new FileReader(_configFile));
 	}
 
