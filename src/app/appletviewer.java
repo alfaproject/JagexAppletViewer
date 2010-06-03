@@ -27,33 +27,32 @@ import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Locale;
 import nativeadvert.browsercontrol;
 
 public final class appletviewer
-  implements ComponentListener
+		implements ComponentListener
 {
-  private static Panel var_1f08;
-  private static Component var_1f10;
-  static boolean debug = false;
-  private static Applet var_1f20;
-  static Hashtable var_1f28 = new Hashtable();
-  static boolean var_1f30;
-  private static MenuBar var_1f38;
-  private static boolean var_1f40;
-  static Frame MainFrame;
-  private static ScrollPane var_1f50;
-  private static Canvas var_1f58;
-  static Hashtable var_1f60 = new Hashtable();
-  private static File _configFile;
-  private static float var_1f70;
-  private static float var_1f78 = 0.0F;
-  private static String var_1f80;
-  private static int[] var_1f88;
-  static String[] languageNames;
-  public static int var_1fa0;
-  public static int var_1fa8;
-  public static boolean var_1fb0;
+	private static Panel var_1f08;
+	private static Component var_1f10;
+	static boolean debug = false;
+	private static Applet var_1f20;
+	static Hashtable var_1f28 = new Hashtable();
+	static boolean var_1f30;
+	private static MenuBar var_1f38;
+	private static boolean var_1f40;
+	static Frame MainFrame;
+	private static ScrollPane var_1f50;
+	private static Canvas var_1f58;
+	static Hashtable var_1f60 = new Hashtable();
+	private static File _configFile;
+	private static String _configUrl;
+	private static float var_1f70;
+	private static float var_1f78 = 0.0F;
+	private static int[] var_1f88;
+	static String[] languageNames;
+	public static int var_1fa0;
+	public static int var_1fa8;
+	public static boolean var_1fb0;
 
   public final void componentMoved(ComponentEvent paramComponentEvent)
   {
@@ -64,7 +63,9 @@ public final class appletviewer
     sub_3809(2);
   }
 
-	private static final boolean sub_2026(byte paramByte, int paramInt) { boolean bool = Preferences.dummy; int i = 0;
+	private static final boolean sub_2026() {
+		boolean bool = Preferences.dummy;
+		int i = 0;
 		var_1f60.clear();
 		LanguageStrings.Load();
 		var_1f28.clear();
@@ -221,8 +222,8 @@ public final class appletviewer
   }
 
 	private static final BufferedReader sub_2562() throws IOException {
-		if (var_1f80 != null) {
-			return new BufferedReader(new InputStreamReader(new URL(var_1f80).openStream()));
+		if (_configUrl != null) {
+			return new BufferedReader(new InputStreamReader(new URL(_configUrl).openStream()));
 		}
 
 		return new BufferedReader(new FileReader(_configFile));
@@ -366,61 +367,18 @@ public final class appletviewer
 				DialogFactory.ShowError(LanguageStrings.Get("err_missing_config"));
 			}
 			_configFile = new File(resourcesPath, configFile);
+			System.out.println("Config File is " + _configFile.getAbsolutePath());
+		} else {
+			_configUrl = configUrl;
+			System.out.println("Config URL is " + _configUrl);
 		}
 
-		int k;
-		int i = 0;
-		do {
-			String str1 = null;
-			do {
-				if (configUrl != null) {
-					var_1f80 = sub_34ed(-1, configUrl);
-					System.out.println("Config URL is " + var_1f80);
+		sub_2026();
 
-					String str3 = var_1f80.toLowerCase();
-
-					if (!str3.startsWith("http://")) {
-						if (!str3.startsWith("https://")) {
-							break; //break label670;
-						}
-						str3 = str3.substring(8);
-						if (!bool) {
-							break; //break label670;
-						}
-					}
-					str3 = str3.substring(7);
-
-					k = str3.indexOf(":");
-
-					if ((k ^ 0xFFFFFFFF) != 0) {
-						str3 = str3.substring(0, k);
-					}
-					int i1 = str3.indexOf("/");
-					if (0 != (i1 ^ 0xFFFFFFFF)) {
-						str3 = str3.substring(0, i1);
-					}
-					if (debug) {
-						System.out.println("Domain: " + str3);
-					}
-					if ((!str3.endsWith(".runescape.com")) && (!str3.endsWith(".funorb.com"))) {
-						DialogFactory.ShowError(LanguageStrings.Get("err_invalid_config"));
-					}
-				}
-
-				if ((sub_2026((byte)69, i)) && (!bool)) {
-					break; //break label829;
-				}
-				str1 = Preferences.Get("Language");
-				i = 0;
-			} while (str1 == null);
-			i = Integer.parseInt(str1);
-		} while (!bool);
-
-		//label829:
 		String str3 = (String)var_1f28.get("viewerversion");
 		if (str3 != null) {
 			try {
-				k = Integer.parseInt(str3);
+				int k = Integer.parseInt(str3);
 				if (-101 > (k ^ 0xFFFFFFFF)) {
 					DialogFactory.ShowOk(LanguageStrings.Get("new_version"));
 				}
@@ -586,47 +544,6 @@ public final class appletviewer
     sub_3809(2);
   }
 
-  private static final String sub_34ed(int paramInt, String paramString)
-  {
-    boolean bool = Preferences.dummy; if (paramInt != -1) {
-      return (String)null;
-    }
-
-    String str1 = paramString;
-    do
-    {
-      int i = str1.indexOf("$(");
-      if ((0 > i) && 
-        (!bool)) {
-        break;
-      }
-
-      int j = str1.indexOf(":", i);
-      int k = str1.indexOf(")", j);
-      if (((j ^ 0xFFFFFFFF) > -1) || (-1 < (k ^ 0xFFFFFFFF)))
-      {
-        break;
-      }
-
-      String str2 = str1.substring(2 + i, j);
-
-      Object localObject = str1.substring(j + 1, k);
-
-      String str3 = Preferences.Get(str2);
-      if (str3 != null)
-      {
-        localObject = str3;
-      }
-      if (k < -1 + str1.length()) {
-        str1 = str1.substring(0, i) + (String)localObject + str1.substring(k - -1); if (!bool) continue;
-      }
-      str1 = str1.substring(0, i) + (String)localObject;
-    }
-    while (!bool);
-
-    return (String)str1;
-  }
-
   public static void readdadvert() {
     if ((!var_1f30) || (var_1f58 != null))
       return;
@@ -782,7 +699,7 @@ public final class appletviewer
 	static {
 		var_1f70 = 58988.0F;
 		_configFile = null;
-		var_1f80 = null;
+		_configUrl = null;
 	}
 
 } //class appletviewer
