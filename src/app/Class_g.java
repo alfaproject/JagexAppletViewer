@@ -33,8 +33,8 @@ final class Class_g
 	}
 
 	public final String getParameter(String paramString) {
-		String str = (String)appletviewer.var_1f60.get(paramString);
-		if ((appletviewer.debug) && (null == str)) {
+		String str = appletviewer.configInner.get(paramString);
+		if (appletviewer.debug && (str == null)) {
 			System.out.println("Unavailable param:" + paramString);
 		}
 		return str;
@@ -42,8 +42,8 @@ final class Class_g
 
 	public final URL getCodeBase() {
 		try {
-			return new URL((String)appletviewer.var_1f28.get("codebase"));
-		} catch (MalformedURLException localMalformedURLException) {
+			return new URL(appletviewer.configOur.get("codebase"));
+		} catch (MalformedURLException ex) {
 			throw new InvalidParameterException();
 		}
 	}
@@ -77,7 +77,7 @@ final class Class_g
 
 	public final URL getDocumentBase() {
 		try {
-			return new URL((String)appletviewer.var_1f28.get("codebase"));
+			return new URL(appletviewer.configOur.get("codebase"));
 		} catch (MalformedURLException localMalformedURLException) {
 			throw new InvalidParameterException();
 		}

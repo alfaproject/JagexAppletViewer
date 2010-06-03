@@ -36,16 +36,12 @@ public final class appletviewer
 	private static Component var_1f10;
 	static boolean debug = false;
 	private static Applet var_1f20;
-	static Hashtable var_1f28 = new Hashtable();
 	static boolean var_1f30;
 	private static MenuBar var_1f38;
 	private static boolean var_1f40;
 	static Frame MainFrame;
 	private static ScrollPane var_1f50;
 	private static Canvas var_1f58;
-	static Hashtable var_1f60 = new Hashtable();
-	private static File _configFile;
-	private static String _configUrl;
 	private static float var_1f70;
 	private static float var_1f78 = 0.0F;
 	private static int[] var_1f88;
@@ -54,9 +50,13 @@ public final class appletviewer
 	public static int var_1fa8;
 	public static boolean var_1fb0;
 
-  public final void componentMoved(ComponentEvent paramComponentEvent)
-  {
-  }
+	private static File _configFile;
+	private static String _configUrl;
+	static Hashtable<String, String> configOur = new Hashtable<String, String>();
+	static Hashtable<String, String> configInner = new Hashtable<String, String>();
+
+	public final void componentMoved(ComponentEvent paramComponentEvent) {
+	}
 
   public final void componentResized(ComponentEvent paramComponentEvent)
   {
@@ -66,10 +66,13 @@ public final class appletviewer
 	private static final boolean sub_2026() {
 		boolean bool = Preferences.dummy;
 		int i = 0;
-		var_1f60.clear();
-		LanguageStrings.Load();
-		var_1f28.clear();
+
 		int k = 0;
+
+		// reset configuration values
+		LanguageStrings.Load();
+		configInner.clear();
+		configOur.clear();
 
 		BufferedReader localBufferedReader = null;
 		try {
@@ -108,7 +111,7 @@ public final class appletviewer
 					if (k != -1) {
 						String name = configLine.substring(0, k).trim().toLowerCase();
 						String value = configLine.substring(k + 1).trim();
-						var_1f28.put(name, value);
+						configOur.put(name, value);
 						if (debug) {
 							System.out.println("Ourconfig - variable=" + name + " value=" + value);
 						}
@@ -123,20 +126,20 @@ public final class appletviewer
 
 					String name = configLine.substring(0, k).trim().toLowerCase();
 					String value = configLine.substring(k + 1).trim();
-					var_1f60.put(name, value);
+					configInner.put(name, value);
 					if (debug) {
 						System.out.println("Innerconfig - variable=" + name + " value=" + value);
 					}
 				}
 			}
-		} catch (IOException localIOException) {
+		} catch (IOException ex) {
 			if (debug) {
-				localIOException.printStackTrace();
+				ex.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_load_config"));
-		} catch (Exception localException) {
+		} catch (Exception ex) {
 			if (debug) {
-				localException.printStackTrace();
+				ex.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_decode_config"));
 		} finally {
@@ -148,7 +151,7 @@ public final class appletviewer
 			}
 		}
 
-		if (0 < i) {
+		if (i > 0) {
 			var_1f88 = new int[i];
 			languageNames = new String[i];
 
@@ -368,7 +371,7 @@ public final class appletviewer
 
 		sub_2026();
 
-		String str3 = (String)var_1f28.get("viewerversion");
+		String str3 = configOur.get("viewerversion");
 		if (str3 != null) {
 			try {
 				int k = Integer.parseInt(str3);
@@ -379,11 +382,11 @@ public final class appletviewer
 			}
 		}
 
-		int l = Integer.parseInt((String)var_1f60.get("modewhat")) - -32;
+		int l = Integer.parseInt(configInner.get("modewhat")) + 32;
 
-		String str4 = (String)var_1f28.get("cachesubdir");
+		String str4 = configOur.get("cachesubdir");
 
-		String str5 = (String)var_1f28.get("codebase");
+		String str5 = configOur.get("codebase");
 
 		String str6 = System.getProperty("os.name").toLowerCase();
 		String str7 = System.getProperty("os.arch").toLowerCase();
@@ -408,7 +411,7 @@ public final class appletviewer
 			byte[] arrayOfByte1;
 			if (!var_1f40) {
 				if (var_1f30) {
-					arrayOfByte1 = sub_3a29((String)var_1f28.get("browsercontrol_win_x86_jar"), 23312, str5);
+					arrayOfByte1 = sub_3a29(configOur.get("browsercontrol_win_x86_jar"), 23312, str5);
 
 					localFile = sub_26a2("browsercontrol.dll", false, str4, l, str8);
 					localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol.dll");
@@ -423,7 +426,7 @@ public final class appletviewer
 					}
 				}
 			} else {
-				arrayOfByte1 = sub_3a29((String)var_1f28.get("browsercontrol_win_amd64_jar"), 23312, str5);
+				arrayOfByte1 = sub_3a29(configOur.get("browsercontrol_win_amd64_jar"), 23312, str5);
 				localFile = sub_26a2("browsercontrol64.dll", false, str4, l, str8);
 
 				localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol64.dll");
@@ -446,7 +449,7 @@ public final class appletviewer
 		}
 
 		try {
-			byte[] arrayOfByte2 = sub_3a29((String)var_1f28.get("loader_jar"), -1, str5);
+			byte[] arrayOfByte2 = sub_3a29(configOur.get("loader_jar"), -1, str5);
 			localObject4 = new Class_s(arrayOfByte2);
 			var_1f20 = (Applet)((Class_s)localObject4).loadClass("loader").newInstance();
 			if (debug) {
@@ -461,12 +464,12 @@ public final class appletviewer
 		LoaderBox.Hide();
 		Class_i.sub_7d4(-12660);
 
-		MainFrame.setTitle((String)var_1f28.get("title"));
-		int i2 = (var_1f30) ? Integer.parseInt((String)var_1f28.get("advert_height")) : 0;
+		MainFrame.setTitle(configOur.get("title"));
+		int i2 = (var_1f30) ? Integer.parseInt(configOur.get("advert_height")) : 0;
 
-		int i3 = Integer.parseInt((String)var_1f28.get("window_preferredwidth"));
+		int i3 = Integer.parseInt(configOur.get("window_preferredwidth"));
 
-		int i4 = Integer.parseInt((String)var_1f28.get("window_preferredheight"));
+		int i4 = Integer.parseInt(configOur.get("window_preferredheight"));
 		int i5 = 40;
 
 		Insets localInsets = MainFrame.getInsets();
@@ -508,7 +511,7 @@ public final class appletviewer
 			try {
 				label1817:
 				System.load(localFile.toString());
-				browsercontrol.create(var_1f58, (String)var_1f28.get("adverturl"));
+				browsercontrol.create(var_1f58, configOur.get("adverturl"));
 				browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
 			} catch (Throwable localThrowable) {
 				if (debug) {
@@ -554,7 +557,7 @@ public final class appletviewer
       }
     }
     try {
-      browsercontrol.create(var_1f58, (String)var_1f28.get("adverturl"));
+      browsercontrol.create(var_1f58, configOur.get("adverturl"));
       browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
     } catch (Throwable localThrowable) {
       if (debug) {
@@ -592,16 +595,16 @@ public final class appletviewer
 
   private static final void sub_3809(int paramInt)
   {
-    int i = (var_1f58 == null) ? 0 : Integer.parseInt((String)var_1f28.get("advert_height"));
+    int i = (var_1f58 == null) ? 0 : Integer.parseInt(configOur.get("advert_height"));
 
     int j = 40;
 
-    int k = Integer.parseInt((String)var_1f28.get("applet_minwidth"));
+    int k = Integer.parseInt(configOur.get("applet_minwidth"));
 
-    int l = Integer.parseInt((String)var_1f28.get("applet_minheight"));
+    int l = Integer.parseInt(configOur.get("applet_minheight"));
 
-    int i1 = Integer.parseInt((String)var_1f28.get("applet_maxwidth"));
-    int i2 = Integer.parseInt((String)var_1f28.get("applet_maxheight"));
+    int i1 = Integer.parseInt(configOur.get("applet_maxwidth"));
+    int i2 = Integer.parseInt(configOur.get("applet_maxheight"));
 
     Dimension localDimension = var_1f50.getSize();
 
