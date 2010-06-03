@@ -298,29 +298,28 @@ public final class appletviewer
 		// load browser control
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
 		File browserControlFile = null;
-		Object localObject4;
 		try {
 			byte[] browserControlBinary;
 			if (!_in64Bits) {
 				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
 				browserControlFile = getLocationForFile("browsercontrol.dll", cacheSubdir, l, homePath);
-				localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol.dll");
-				if (null == localObject4) {
+
+				byte[] localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol.dll");
+				if (localObject4 == null) {
 					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
 				}
-
-				sub_3774((byte[])localObject4, false, browserControlFile);
+				saveFile(localObject4, browserControlFile);
 			} else {
 				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
 				browserControlFile = getLocationForFile("browsercontrol64.dll", cacheSubdir, l, homePath);
-				localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol64.dll");
-				if (null == localObject4) {
+
+				byte[] localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol64.dll");
+				if (localObject4 == null) {
 					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
 				}
-
-				sub_3774((byte[])localObject4, false, browserControlFile);
+				saveFile(localObject4, browserControlFile);
 			}
 			if (debug) {
 				System.out.println("dlldata : " + browserControlBinary.length);
@@ -339,8 +338,8 @@ public final class appletviewer
 
 		try {
 			byte[] arrayOfByte2 = downloadBinary(configOur.get("loader_jar"), codeBase);
-			localObject4 = new Class_s(arrayOfByte2);
-			var_1f20 = (Applet)((Class_s)localObject4).loadClass("loader").newInstance();
+			Class_s localObject4 = new Class_s(arrayOfByte2);
+			var_1f20 = (Applet)(localObject4).loadClass("loader").newInstance();
 			if (debug) {
 				System.out.println("loader_jar : " + arrayOfByte2.length);
 			}
@@ -464,23 +463,20 @@ public final class appletviewer
 		System.exit(0);
 	}
 
-  private static final boolean sub_3774(byte[] paramArrayOfByte, boolean paramBoolean, File paramFile) {
-    try {
-      FileOutputStream localFileOutputStream = new FileOutputStream(paramFile);
-      localFileOutputStream.write(paramArrayOfByte, 0, paramArrayOfByte.length);
-      if (paramBoolean) {
-        var_1f50 = (ScrollPane)null;
-      }
-      localFileOutputStream.close();
-      return true;
-    } catch (IOException localIOException) {
-      if (debug)
-      {
-        localIOException.printStackTrace();
-      }
-      DialogFactory.ShowError(LanguageStrings.Get("err_save_file"));
-    }return false;
-  }
+	private static final boolean saveFile(byte[] binaryData, File filePath) {
+		try {
+			FileOutputStream writer = new FileOutputStream(filePath);
+			writer.write(binaryData, 0, binaryData.length);
+			writer.close();
+			return true;
+		} catch (IOException localIOException) {
+			if (debug) {
+				localIOException.printStackTrace();
+			}
+			DialogFactory.ShowError(LanguageStrings.Get("err_save_file"));
+		}
+		return false;
+	}
 
   private static final void sub_3809(int paramInt)
   {
