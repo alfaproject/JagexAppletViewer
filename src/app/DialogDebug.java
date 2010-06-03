@@ -62,8 +62,8 @@ final class DialogDebug extends OutputStream
 				_loaded = true;
 			}
 
-			_buffer.append(String.valueOf((char)i));
-			if (i == 10) {
+			_buffer.append((char)i);
+			if ((char)i == '\n') {
 				_textArea.append(_buffer.toString());
 				_buffer = new StringBuffer(1024);
 			}
