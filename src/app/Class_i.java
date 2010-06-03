@@ -32,7 +32,7 @@ final class Class_i
 				if ((str1 != null) && (str1.equals("_top")) && (((str2.endsWith("MAGICQUIT")) || (0 != (str2.indexOf("/quit.ws") ^ 0xFFFFFFFF)) || ((str2.indexOf(".ws") == -1) && (str2.endsWith("/")))))) {
 					appletviewer.Terminate();
 				}
-				if (appletviewer.var_1f30) {
+				if (appletviewer.inWindows) {
 					if ((!str2.startsWith("http://")) && (!str2.startsWith("https://"))) {
 						throw new Exception();
 					}

@@ -8,9 +8,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
 import java.awt.Panel;
 import java.awt.ScrollPane;
 import java.awt.Toolkit;
@@ -25,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import nativeadvert.browsercontrol;
 
@@ -36,9 +32,8 @@ public final class appletviewer
 	private static Component var_1f10;
 	static boolean debug = false;
 	private static Applet var_1f20;
-	static boolean var_1f30;
-	private static MenuBar var_1f38;
-	private static boolean var_1f40;
+	static boolean inWindows;
+	private static boolean _in64Bits;
 	static Frame MainFrame;
 	private static ScrollPane var_1f50;
 	private static Canvas var_1f58;
@@ -58,10 +53,9 @@ public final class appletviewer
 	public final void componentMoved(ComponentEvent paramComponentEvent) {
 	}
 
-  public final void componentResized(ComponentEvent paramComponentEvent)
-  {
-    sub_3809(2);
-  }
+	public final void componentResized(ComponentEvent paramComponentEvent) {
+		sub_3809(2);
+	}
 
 	private static final void loadConfigValues() {
 		// reset configuration values
@@ -140,9 +134,8 @@ public final class appletviewer
 		}
 	}
 
-  public final void componentHidden(ComponentEvent paramComponentEvent)
-  {
-  }
+	public final void componentHidden(ComponentEvent paramComponentEvent) {
+	}
 
 	private static final BufferedReader getConfigReader() throws IOException {
 		if (_configUrl != null) {
@@ -151,24 +144,21 @@ public final class appletviewer
 		return new BufferedReader(new FileReader(_configFile));
 	}
 
-  static final int sub_260c(boolean paramBoolean)
-  {
-    int i = DialogLanguage.GetChoiceIndex();
-    if (i < 0)
-    {
-      return -1;
-    }
-    Preferences.Set("Language", Integer.toString(_languageIds[i]));
-    if (paramBoolean != true) {
-      removeadvert();
-    }
-    Preferences.Save();
-    return i;
-  }
+	static final int sub_260c(boolean paramBoolean) {
+		int i = DialogLanguage.GetChoiceIndex();
+		if (i < 0) {
+			return -1;
+		}
+		Preferences.Set("Language", Integer.toString(_languageIds[i]));
+		if (paramBoolean != true) {
+			removeadvert();
+		}
+		Preferences.Save();
+		return i;
+	}
 
-  public final void componentShown(ComponentEvent paramComponentEvent)
-  {
-  }
+	public final void componentShown(ComponentEvent paramComponentEvent) {
+	}
 
   private static final File sub_26a2(String paramString1, boolean paramBoolean, String paramString2, int paramInt, String paramString3)
   {
@@ -297,65 +287,60 @@ public final class appletviewer
 
 		loadConfigValues();
 
-		String str3 = configOur.get("viewerversion");
-		if (str3 != null) {
+		String newVersion = configOur.get("viewerversion");
+		if (newVersion != null) {
 			try {
-				int k = Integer.parseInt(str3);
-				if (-101 > (k ^ 0xFFFFFFFF)) {
+				if (Integer.parseInt(newVersion) > 100) {
 					DialogFactory.ShowOk(LanguageStrings.Get("new_version"));
 				}
-			} catch (NumberFormatException localNumberFormatException) {
+			} catch (NumberFormatException ex) {
 			}
 		}
 
 		int l = Integer.parseInt(configInner.get("modewhat")) + 32;
 
-		String str4 = configOur.get("cachesubdir");
+		String cacheSubdir = configOur.get("cachesubdir");
+		String codeBase = configOur.get("codebase");
 
-		String str5 = configOur.get("codebase");
+		String osName = System.getProperty("os.name").toLowerCase();
+		String osArch = System.getProperty("os.arch").toLowerCase();
+		inWindows = osName.startsWith("win");
+		_in64Bits = (osArch.startsWith("amd64") || osArch.startsWith("x86_64"));
 
-		String str6 = System.getProperty("os.name").toLowerCase();
-		String str7 = System.getProperty("os.arch").toLowerCase();
-		var_1f30 = str6.startsWith("win");
-
-		var_1f40 = ((var_1f30) && (str7.startsWith("amd64"))) || (str7.startsWith("x86_64"));
-		String str8 = null;
+		String homePath = null;
 		try {
-			str8 = System.getProperty("user.home");
-			if (str8 != null) {
-				str8 = str8 + "/";
+			homePath = System.getProperty("user.home");
+			if ((homePath != null) && !homePath.endsWith("/")) {
+				homePath += "/";
 			}
-		} catch (Exception localException1) {
+		} catch (Exception ex) {
 		}
-		if (null == str8) {
-			str8 = "~/";
+		if (homePath == null) {
+			homePath = "~/";
 		}
+
+		// load browser control
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
 		File localFile = null;
 		Object localObject4;
 		try {
-			byte[] arrayOfByte1;
-			if (!var_1f40) {
-				if (var_1f30) {
-					arrayOfByte1 = sub_3a29(configOur.get("browsercontrol_win_x86_jar"), 23312, str5);
+			byte[] browserControlBinary;
+			if (!_in64Bits) {
+				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
 
-					localFile = sub_26a2("browsercontrol.dll", false, str4, l, str8);
-					localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol.dll");
-					if (null == localObject4) {
-						localFile = null;
-						DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
-					}
-
-					sub_3774((byte[])localObject4, false, localFile);
-					if (debug) {
-						System.out.println("dlldata : " + arrayOfByte1.length);
-					}
+				localFile = sub_26a2("browsercontrol.dll", false, cacheSubdir, l, homePath);
+				localObject4 = new Class_u(browserControlBinary).sub_ca1((byte)54, "browsercontrol.dll");
+				if (null == localObject4) {
+					localFile = null;
+					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
 				}
-			} else {
-				arrayOfByte1 = sub_3a29(configOur.get("browsercontrol_win_amd64_jar"), 23312, str5);
-				localFile = sub_26a2("browsercontrol64.dll", false, str4, l, str8);
 
-				localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol64.dll");
+				sub_3774((byte[])localObject4, false, localFile);
+			} else {
+				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
+				localFile = sub_26a2("browsercontrol64.dll", false, cacheSubdir, l, homePath);
+
+				localObject4 = new Class_u(browserControlBinary).sub_ca1((byte)54, "browsercontrol64.dll");
 				if (null == localObject4) {
 					localFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
@@ -363,19 +348,23 @@ public final class appletviewer
 
 				sub_3774((byte[])localObject4, false, localFile);
 			}
-		} catch (Exception localException2) {
 			if (debug) {
-				localException2.printStackTrace();
+				System.out.println("dlldata : " + browserControlBinary.length);
+			}
+		} catch (Exception ex) {
+			if (debug) {
+				ex.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_load_bc"));
 		}
+
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app"));
-		if (var_1f30) {
+		if (inWindows) {
 			Class_e.sub_ae5();
 		}
 
 		try {
-			byte[] arrayOfByte2 = sub_3a29(configOur.get("loader_jar"), -1, str5);
+			byte[] arrayOfByte2 = downloadBinary(configOur.get("loader_jar"), codeBase);
 			localObject4 = new Class_s(arrayOfByte2);
 			var_1f20 = (Applet)((Class_s)localObject4).loadClass("loader").newInstance();
 			if (debug) {
@@ -391,7 +380,7 @@ public final class appletviewer
 		Class_i.sub_7d4(-12660);
 
 		MainFrame.setTitle(configOur.get("title"));
-		int i2 = (var_1f30) ? Integer.parseInt(configOur.get("advert_height")) : 0;
+		int i2 = (inWindows ? Integer.parseInt(configOur.get("advert_height")) : 0);
 
 		int i3 = Integer.parseInt(configOur.get("window_preferredwidth"));
 
@@ -411,7 +400,7 @@ public final class appletviewer
 
 		int i6 = (!"yes".equals(Preferences.Get("Member"))) ? 1 : 0;
 		i6 = 1;
-		if ((var_1f30) && (i6 != 0)) {
+		if (inWindows && (i6 != 0)) {
 			var_1f58 = new Canvas();
 			var_1f08.add(var_1f58);
 		}
@@ -422,7 +411,7 @@ public final class appletviewer
 		MainFrame.doLayout();
 		sub_3809(-1);
 		var_1f50.doLayout();
-		if (var_1f30) if (i6 != 0) {
+		if (inWindows) if (i6 != 0) {
 			do {
 				while (true) {
 					if ((var_1f58.isDisplayable()) && (var_1f58.isShowing())) {
@@ -467,7 +456,7 @@ public final class appletviewer
   }
 
   public static void readdadvert() {
-    if ((!var_1f30) || (var_1f58 != null))
+    if (!inWindows || (var_1f58 != null))
       return;
     var_1f58 = new Canvas();
     var_1f08.add(var_1f58);
@@ -580,43 +569,40 @@ public final class appletviewer
     browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
   }
 
-  private static final byte[] sub_3a29(String paramString1, int paramInt, String paramString2)
-  {
-    boolean bool = Preferences.dummy; if (paramInt != 23312) {
-      var_1f78 = 0.7462825F;
-    }
+	private static final byte[] downloadBinary(String fileName, String baseUrl) {
+		byte[] buffer = new byte[300000];
+		int bufferLength = 0;
 
-    byte[] arrayOfByte1 = new byte[300000];
-
-    int i = 0;
-    try
-    {
-      InputStream localInputStream = new URL(paramString2 + paramString1).openStream();
-		do {
-			if (arrayOfByte1.length <= i) {
-				break;
+		InputStream reader = null;
+		try {
+			reader = new URL(baseUrl + fileName).openStream();
+			int bytesRead;
+			while (
+				(buffer.length > bufferLength) &&
+				((bytesRead = reader.read(buffer, bufferLength, buffer.length - bufferLength)) > 0)
+			) {
+				var_1f78 += bytesRead;
+				bufferLength += bytesRead;
+				LoaderBox.SetProgressPercent((int)(var_1f78 / var_1f70 * 100.0F));
 			}
-			int j = localInputStream.read(arrayOfByte1, i, arrayOfByte1.length + -i);
-			if ((-1 < (j ^ 0xFFFFFFFF)) && (!bool))
-				break;
-			var_1f78 += j;
-			i += j;
-			LoaderBox.SetProgressPercent((int)(var_1f78 / var_1f70 * 100.0F));
-		} while (!bool);
+		} catch (Exception ex) {
+			if (debug) {
+				ex.printStackTrace();
+			}
+			DialogFactory.ShowError(LanguageStrings.Get("err_downloading") + ": " + fileName);
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException ex) {
+				}
+			}
+		}
 
-      localInputStream.close();
-    } catch (Exception localException) {
-      if (debug)
-      {
-        localException.printStackTrace();
-      }
-      DialogFactory.ShowError(LanguageStrings.Get("err_downloading") + ": " + paramString1);
-    }
-
-    byte[] arrayOfByte2 = new byte[i];
-    System.arraycopy(arrayOfByte1, 0, arrayOfByte2, 0, i);
-    return arrayOfByte2;
-  }
+		byte[] binary = new byte[bufferLength];
+		System.arraycopy(buffer, 0, binary, 0, bufferLength);
+		return binary;
+	}
 
 	static {
 		var_1f70 = 58988.0F;
