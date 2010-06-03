@@ -328,336 +328,309 @@ public final class appletviewer
     throw new RuntimeException("Fatal - could not find ANY location for file: " + paramString1);
   }
 
-  public static final void sub_29b0(String paramString, int paramInt) {
-    boolean bool = Preferences.dummy; var_1f18 = Boolean.getBoolean("com.jagex.debug");
-    if (var_1f18)
-    {
-      System.setErr(Class_q.sub_5f3("Jagex host console", true));
-      System.setOut(Class_q.sub_5f3("Jagex host console", true));
-      System.out.println("release #7");
-      System.out.println("java.version = " + System.getProperty("java.version"));
-      System.out.println("os.name = " + System.getProperty("os.name"));
-      System.out.println("os.arch = " + System.getProperty("os.arch"));
-    }
+	public static final void Load(String resourcesFolder) {
+		boolean bool = Preferences.dummy;
+		var_1f18 = Boolean.getBoolean("com.jagex.debug");
+		if (var_1f18) {
+			System.setErr(Class_q.sub_5f3("Jagex host console", true));
+			System.setOut(Class_q.sub_5f3("Jagex host console", true));
+			System.out.println("release #7");
+			System.out.println("java.version = " + System.getProperty("java.version"));
+			System.out.println("os.name = " + System.getProperty("os.name"));
+			System.out.println("os.arch = " + System.getProperty("os.arch"));
+		}
 
-    Preferences.Load();
+		Preferences.Load();
 
-    String str1 = Preferences.Get("Language");
+		String str1 = Preferences.Get("Language");
 
-    int i = 0;
-    if (null != str1) {
-      i = Integer.parseInt(str1); if (!bool) {
-        //break label382;
-      }
-    }
+		int i = 0;
+		if (null != str1) {
+			i = Integer.parseInt(str1);
+			if (!bool) {
+				//break label382;
+			}
+		}
 
-    Object localObject1 = Locale.getDefault();
-    Object localObject2 = ((Locale)localObject1).getISO3Language();
+		Object localObject1 = Locale.getDefault();
+		Object localObject2 = ((Locale)localObject1).getISO3Language();
 
-    Object localObject3 = ((Locale)localObject1).getISO3Country();
+		Object localObject3 = ((Locale)localObject1).getISO3Country();
 
-    int j = -1;
-    if (null == localObject2) {
-      if (null == localObject3) {
-        //break label357;
-      }
-      if ((((String)localObject3).equals("GB")) || (((String)localObject3).equals("US")))
-      {
-        j = 0;
-      }
-      if (((String)localObject3).equals("DE"))
-      {
-        j = 1;
-      }
-      if (((String)localObject3).equals("FR"))
-      {
-        j = 2;
-      }
-      if (!((String)localObject3).equals("BR")) {
-        //break label357;
-	  }
-      j = 3; if (!bool) {
-        //break label357;
-      }
+		int j = -1;
+		if (null == localObject2) {
+			if (null == localObject3) {
+				//break label357;
+			}
+			if ((((String)localObject3).equals("GB")) || (((String)localObject3).equals("US"))) {
+				j = 0;
+			}
+			if (((String)localObject3).equals("DE")) {
+				j = 1;
+			}
+			if (((String)localObject3).equals("FR")) {
+				j = 2;
+			}
+			if (!((String)localObject3).equals("BR")) {
+				//break label357;
+			}
+			j = 3;
+			if (!bool) {
+				//break label357;
+			}
+		}
 
-    }
+		if (((String)localObject2).equals("eng")) {
+			j = 0;
+		}
+		if ((((String)localObject2).equals("ger")) || (((String)localObject2).equals("deu"))) {
+			j = 1;
+		}
+		if ((((String)localObject2).equals("fre")) || (((String)localObject2).equals("fra"))) {
+			j = 2;
+		}
+		if (((String)localObject2).equals("por")) {
+			j = 3;
+		}
 
-    if (((String)localObject2).equals("eng"))
-    {
-      j = 0;
-    }
-    if ((((String)localObject2).equals("ger")) || (((String)localObject2).equals("deu")))
-    {
-      j = 1;
-    }
-    if ((((String)localObject2).equals("fre")) || (((String)localObject2).equals("fra"))) {
-      j = 2;
-    }
-    if (((String)localObject2).equals("por"))
-    {
-      j = 3;
-    }
+		if (j >= 0) {
+			label357:
+			Preferences.Set("Language", Integer.toString(j));
+			Preferences.Save();
+		}
 
-    if (j >= 0)
-    {
-      label357: Preferences.Set("Language", Integer.toString(j));
-      Preferences.Save();
-    }
+		label382:
+		LanguageStrings.Load();
 
-    label382: LanguageStrings.Load();
+		MainFrame = new Frame();
 
-    MainFrame = new Frame();
+		localObject1 = new File(new File(System.getProperty("user.dir")).getParentFile(), resourcesFolder);
+		localObject2 = new File((File)localObject1, "jagexappletviewer.png");
+		System.out.println("Trying to load icon file: " + ((File)localObject2).getAbsolutePath());
+		if (((File)localObject2).exists()) {
+			localObject3 = Toolkit.getDefaultToolkit().getImage(((File)localObject2).getAbsolutePath());
+			if (localObject3 != null) {
+				MainFrame.setIconImage((Image)localObject3);
+			}
+		}
 
-    localObject1 = new File(new File(System.getProperty("user.dir")).getParentFile(), paramString);
-    localObject2 = new File((File)localObject1, "jagexappletviewer.png");
-    System.out.println("Trying to load icon file: " + ((File)localObject2).getAbsolutePath());
-    if (((File)localObject2).exists())
-    {
-      localObject3 = Toolkit.getDefaultToolkit().getImage(((File)localObject2).getAbsolutePath());
-      if (localObject3 != null) {
-        MainFrame.setIconImage((Image)localObject3);
-      }
-    }
+		LoaderBox.Create();
 
-    LoaderBox.Create();
+		LoaderBox.SetProgressText(LanguageStrings.Get("loading_config"));
+		localObject3 = System.getProperty("com.jagex.config");
 
-    LoaderBox.SetProgressText(LanguageStrings.Get("loading_config"));
-    localObject3 = System.getProperty("com.jagex.config");
+		String str2 = System.getProperty("com.jagex.configfile");
+		if (null == localObject3) {
+			if (str2 == null) {
+				DialogFactory.ShowError(LanguageStrings.Get("err_missing_config"));
+			}
+			var_1f68 = new File((File)localObject1, str2);
+		}
+		//label670:
+		int k;
+		do {
+			do {
+				if (localObject3 != null) {
+					var_1f80 = sub_34ed(-1, (String)localObject3);
+					System.out.println("Config URL is " + var_1f80);
 
-    String str2 = System.getProperty("com.jagex.configfile");
-    if (null == localObject3)
-    {
-      if (str2 == null) {
-        DialogFactory.ShowError(LanguageStrings.Get("err_missing_config"));
-      }
-      var_1f68 = new File((File)localObject1, str2);
-    }
-    //label670:
-			  int k;
-    do {
-      do {
-        if (localObject3 != null)
-        {
-          var_1f80 = sub_34ed(-1, (String)localObject3);
-          System.out.println("Config URL is " + var_1f80);
+					String str3 = var_1f80.toLowerCase();
 
-          String str3 = var_1f80.toLowerCase();
+					if (!str3.startsWith("http://")) {
+						if (!str3.startsWith("https://")) {
+							break; //break label670;
+						}
+						str3 = str3.substring(8);
+						if (!bool) {
+							break; //break label670;
+						}
+					}
+					str3 = str3.substring(7);
 
-          if (!str3.startsWith("http://")) {
-            if (!str3.startsWith("https://")) break; //break label670;
-            str3 = str3.substring(8); if (!bool)
-              break; //break label670;
-          }
-          str3 = str3.substring(7);
+					k = str3.indexOf(":");
 
-          k = str3.indexOf(":");
+					if ((k ^ 0xFFFFFFFF) != 0) {
+						str3 = str3.substring(0, k);
+					}
+					int i1 = str3.indexOf("/");
+					if (0 != (i1 ^ 0xFFFFFFFF)) {
+						str3 = str3.substring(0, i1);
+					}
+					if (var_1f18) {
+						System.out.println("Domain: " + str3);
+					}
+					if ((!str3.endsWith(".runescape.com")) && (!str3.endsWith(".funorb.com"))) {
+						DialogFactory.ShowError(LanguageStrings.Get("err_invalid_config"));
+					}
+				}
 
-          if ((k ^ 0xFFFFFFFF) != 0)
-          {
-            str3 = str3.substring(0, k);
-          }
-          int i1 = str3.indexOf("/");
-          if (0 != (i1 ^ 0xFFFFFFFF)) {
-            str3 = str3.substring(0, i1);
-          }
-          if (var_1f18) {
-            System.out.println("Domain: " + str3);
-          }
-          if ((!str3.endsWith(".runescape.com")) && (!str3.endsWith(".funorb.com")))
-          {
-            DialogFactory.ShowError(LanguageStrings.Get("err_invalid_config"));
-          }
+				if ((sub_2026((byte)69, i)) && (!bool)) {
+					break; //break label829;
+				}
+				str1 = Preferences.Get("Language");
+				i = 0;
+			} while (str1 == null);
+			i = Integer.parseInt(str1);
+		} while (!bool);
 
-        }
+		//label829:
+		String str3 = (String)var_1f28.get("viewerversion");
+		if (str3 != null) {
+			try {
+				k = Integer.parseInt(str3);
+				if (-101 > (k ^ 0xFFFFFFFF)) {
+					DialogFactory.ShowOk(LanguageStrings.Get("new_version"));
+				}
+			} catch (NumberFormatException localNumberFormatException) {
+			}
+		}
 
-        if ((sub_2026((byte)69, i)) &&
-          (!bool))
-          break; //break label829;
-        str1 = Preferences.Get("Language");
-        i = 0;
-      }while (str1 == null);
-      i = Integer.parseInt(str1); } while (!bool);
+		int l = Integer.parseInt((String)var_1f60.get("modewhat")) - -32;
 
-    //label829:
-			  String str3 = (String)var_1f28.get("viewerversion");
-    if (str3 != null)
-    {
-      try
-      {
-        k = Integer.parseInt(str3);
-        if (-101 > (k ^ 0xFFFFFFFF))
-        {
-          DialogFactory.ShowOk(LanguageStrings.Get("new_version"));
-        }
-      }
-      catch (NumberFormatException localNumberFormatException)
-      {
-      }
-    }
+		String str4 = (String)var_1f28.get("cachesubdir");
 
-    int l = Integer.parseInt((String)var_1f60.get("modewhat")) - -32;
+		String str5 = (String)var_1f28.get("codebase");
 
-    String str4 = (String)var_1f28.get("cachesubdir");
+		String str6 = System.getProperty("os.name").toLowerCase();
+		String str7 = System.getProperty("os.arch").toLowerCase();
+		var_1f30 = str6.startsWith("win");
 
-    String str5 = (String)var_1f28.get("codebase");
+		var_1f40 = ((var_1f30) && (str7.startsWith("amd64"))) || (str7.startsWith("x86_64"));
+		String str8 = null;
+		try {
+			str8 = System.getProperty("user.home");
+			if (str8 != null) {
+				str8 = str8 + "/";
+			}
+		} catch (Exception localException1) {
+		}
+		if (null == str8) {
+			str8 = "~/";
+		}
+		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
+		File localFile = null;
+		Object localObject4;
+		try {
+			byte[] arrayOfByte1;
+			if (!var_1f40) {
+				if (var_1f30) {
+					arrayOfByte1 = sub_3a29((String)var_1f28.get("browsercontrol_win_x86_jar"), 23312, str5);
 
-    String str6 = System.getProperty("os.name").toLowerCase();
-    String str7 = System.getProperty("os.arch").toLowerCase();
-    var_1f30 = str6.startsWith("win");
+					localFile = sub_26a2("browsercontrol.dll", false, str4, l, str8);
+					localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol.dll");
+					if (null == localObject4) {
+						localFile = null;
+						DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
+					}
 
-    var_1f40 = ((var_1f30) && (str7.startsWith("amd64"))) || (str7.startsWith("x86_64"));
-    String str8 = null;
-    try {
-      str8 = System.getProperty("user.home");
-      if (str8 != null)
-        str8 = str8 + "/";
-    }
-    catch (Exception localException1)
-    {
-    }
-    if (null == str8)
-    {
-      str8 = "~/";
-    }
-    LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
-    File localFile = null;
-    Object localObject4;
-    try
-    {
-      byte[] arrayOfByte1;
-      if (!var_1f40) {
-        if (var_1f30)
-        {
-          arrayOfByte1 = sub_3a29((String)var_1f28.get("browsercontrol_win_x86_jar"), 23312, str5);
+					sub_3774((byte[])localObject4, false, localFile);
+					if (var_1f18) {
+						System.out.println("dlldata : " + arrayOfByte1.length);
+					}
+				}
+			} else {
+				arrayOfByte1 = sub_3a29((String)var_1f28.get("browsercontrol_win_amd64_jar"), 23312, str5);
+				localFile = sub_26a2("browsercontrol64.dll", false, str4, l, str8);
 
-          localFile = sub_26a2("browsercontrol.dll", false, str4, l, str8);
-          localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol.dll");
-          if (null == localObject4)
-          {
-            localFile = null;
-            DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
-          }
+				localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol64.dll");
+				if (null == localObject4) {
+					localFile = null;
+					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
+				}
 
-          sub_3774((byte[])localObject4, false, localFile);
-          if (var_1f18) {
-            System.out.println("dlldata : " + arrayOfByte1.length);
-          }
-        }
-
-      }
-      else
-      {
-        arrayOfByte1 = sub_3a29((String)var_1f28.get("browsercontrol_win_amd64_jar"), paramInt + 23313, str5);
-        localFile = sub_26a2("browsercontrol64.dll", false, str4, l, str8);
-
-        localObject4 = new Class_u(arrayOfByte1).sub_ca1((byte)54, "browsercontrol64.dll");
-        if (null == localObject4)
-        {
-          localFile = null;
-          DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
-        }
-
-        sub_3774((byte[])localObject4, false, localFile);
-      }
-    }
-    catch (Exception localException2) {
-      if (var_1f18)
-      {
-        localException2.printStackTrace();
-      }
-      DialogFactory.ShowError(LanguageStrings.Get("err_load_bc"));
-    }
-    LoaderBox.SetProgressText(LanguageStrings.Get("loading_app"));
+				sub_3774((byte[])localObject4, false, localFile);
+			}
+		} catch (Exception localException2) {
+			if (var_1f18) {
+				localException2.printStackTrace();
+			}
+			DialogFactory.ShowError(LanguageStrings.Get("err_load_bc"));
+		}
+		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app"));
 		if (var_1f30) {
 			Class_e.sub_ae5();
 		}
 
-    try
-    {
-      byte[] arrayOfByte2 = sub_3a29((String)var_1f28.get("loader_jar"), paramInt ^ 0xFFFFA4EF, str5);
-      localObject4 = new Class_s(arrayOfByte2);
-      var_1f20 = (Applet)((Class_s)localObject4).loadClass("loader").newInstance();
-      if (var_1f18)
-      {
-        System.out.println("loader_jar : " + arrayOfByte2.length);
-      }
-    } catch (Exception localException3) {
-      if (var_1f18)
-      {
-        localException3.printStackTrace();
-      }
-      DialogFactory.ShowError(LanguageStrings.Get("err_target_applet"));
-    }
-    LoaderBox.Hide();
-    Class_i.sub_7d4(-12660);
+		try {
+			byte[] arrayOfByte2 = sub_3a29((String)var_1f28.get("loader_jar"), -1, str5);
+			localObject4 = new Class_s(arrayOfByte2);
+			var_1f20 = (Applet)((Class_s)localObject4).loadClass("loader").newInstance();
+			if (var_1f18) {
+				System.out.println("loader_jar : " + arrayOfByte2.length);
+			}
+		} catch (Exception localException3) {
+			if (var_1f18) {
+				localException3.printStackTrace();
+			}
+			DialogFactory.ShowError(LanguageStrings.Get("err_target_applet"));
+		}
+		LoaderBox.Hide();
+		Class_i.sub_7d4(-12660);
 
-    MainFrame.setTitle((String)var_1f28.get("title"));
-    int i2 = (var_1f30) ? Integer.parseInt((String)var_1f28.get("advert_height")) : 0;
+		MainFrame.setTitle((String)var_1f28.get("title"));
+		int i2 = (var_1f30) ? Integer.parseInt((String)var_1f28.get("advert_height")) : 0;
 
-    int i3 = Integer.parseInt((String)var_1f28.get("window_preferredwidth"));
+		int i3 = Integer.parseInt((String)var_1f28.get("window_preferredwidth"));
 
-    int i4 = Integer.parseInt((String)var_1f28.get("window_preferredheight"));
-    int i5 = 40;
+		int i4 = Integer.parseInt((String)var_1f28.get("window_preferredheight"));
+		int i5 = 40;
 
-    Insets localInsets = MainFrame.getInsets();
-    MainFrame.setSize(i3 + (localInsets.left - -localInsets.right), i5 + localInsets.top + (i2 + i4) - -localInsets.bottom);
-    MainFrame.setLocationRelativeTo(null);
-    MainFrame.setVisible(true);
-    var_1f50 = new ScrollPane();
-    MainFrame.add(var_1f50);
-    var_1f08 = new Panel();
-    var_1f08.setBackground(Color.black);
-    var_1f08.setLayout(null);
-    var_1f50.add(var_1f08);
+		Insets localInsets = MainFrame.getInsets();
+		MainFrame.setSize(i3 + (localInsets.left - -localInsets.right), i5 + localInsets.top + (i2 + i4) - -localInsets.bottom);
+		MainFrame.setLocationRelativeTo(null);
+		MainFrame.setVisible(true);
+		var_1f50 = new ScrollPane();
+		MainFrame.add(var_1f50);
+		var_1f08 = new Panel();
+		var_1f08.setBackground(Color.black);
+		var_1f08.setLayout(null);
+		var_1f50.add(var_1f08);
 
-    int i6 = (!"yes".equals(Preferences.Get("Member"))) ? 1 : 0;
-    i6 = 1;
-    if ((var_1f30) && (i6 != 0))
-    {
-      var_1f58 = new Canvas();
-      var_1f08.add(var_1f58);
-    }
+		int i6 = (!"yes".equals(Preferences.Get("Member"))) ? 1 : 0;
+		i6 = 1;
+		if ((var_1f30) && (i6 != 0)) {
+			var_1f58 = new Canvas();
+			var_1f08.add(var_1f58);
+		}
 
-    var_1f08.add(var_1f20);
-    var_1f10 = new Class_a(LanguageStrings.Get("tandc"));
-    var_1f08.add(var_1f10);
-    MainFrame.doLayout();
-    sub_3809(paramInt ^ 0xFFFFFFFD);
-    var_1f50.doLayout();
-    if (var_1f30) if (i6 != 0)
-      {
-        do
-          while (true)
-          {
-            if ((var_1f58.isDisplayable()) && (var_1f58.isShowing())) {
-              break; //break label1817;
-            }
-            try
-            {
-              Thread.sleep(100L); } catch (Exception localException4) {
-            }
-          }
-        while (!bool);
-        try
-        {
-          label1817: System.load(localFile.toString());
-          browsercontrol.create(var_1f58, (String)var_1f28.get("adverturl"));
-          browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
-        } catch (Throwable localThrowable) {
-          if (var_1f18) {
-            localThrowable.printStackTrace();
-          }
-          DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
-          return;
-        }
-      }
+		var_1f08.add(var_1f20);
+		var_1f10 = new Class_a(LanguageStrings.Get("tandc"));
+		var_1f08.add(var_1f10);
+		MainFrame.doLayout();
+		sub_3809(-1);
+		var_1f50.doLayout();
+		if (var_1f30) if (i6 != 0) {
+			do {
+				while (true) {
+					if ((var_1f58.isDisplayable()) && (var_1f58.isShowing())) {
+						break; //break label1817;
+					}
+					try {
+						Thread.sleep(100L);
+					} catch (Exception localException4) {
+					}
+				}
+			} while (!bool);
+			try {
+				label1817:
+				System.load(localFile.toString());
+				browsercontrol.create(var_1f58, (String)var_1f28.get("adverturl"));
+				browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
+			} catch (Throwable localThrowable) {
+				if (var_1f18) {
+					localThrowable.printStackTrace();
+				}
+				DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
+				return;
+			}
+		}
 
-    MainFrame.addWindowListener(MainWindowAdapter.GetInstance());
-    var_1f50.addComponentListener(new appletviewer());
-    var_1f20.setStub(new Class_g());
-    var_1f20.init();
-    var_1f20.start();
-  }
+		MainFrame.addWindowListener(MainWindowAdapter.GetInstance());
+		var_1f50.addComponentListener(new appletviewer());
+		var_1f20.setStub(new Class_g());
+		var_1f20.init();
+		var_1f20.start();
+	}
 
   public static void removeadvert() {
     if (var_1f58 == null)
