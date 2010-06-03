@@ -3,12 +3,9 @@ package app;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-final class Class_f
-  implements ActionListener
-{
-  public final void actionPerformed(ActionEvent paramActionEvent)
-  {
-    if ((appletviewer.sub_260c(true) ^ 0xFFFFFFFF) <= -1)
+final class Class_f implements ActionListener {
+  public final void actionPerformed(ActionEvent paramActionEvent) {
+    if (appletviewer.sub_260c(true) >= 0)
       DialogFactory.ShowOk(LanguageStrings.Get("changes_on_restart"));
   }
 }
