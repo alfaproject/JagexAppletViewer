@@ -44,7 +44,7 @@ public final class appletviewer
 	private static Canvas var_1f58;
 	private static float var_1f70;
 	private static float var_1f78 = 0.0F;
-	private static int[] var_1f88;
+	private static int[] _languageIds;
 	static String[] languageNames;
 	public static int var_1fa0;
 	public static int var_1fa8;
@@ -63,12 +63,7 @@ public final class appletviewer
     sub_3809(2);
   }
 
-	private static final boolean sub_2026() {
-		boolean bool = Preferences.dummy;
-		int i = 0;
-
-		int k = 0;
-
+	private static final void loadConfigValues() {
 		// reset configuration values
 		LanguageStrings.Load();
 		configInner.clear();
@@ -88,17 +83,10 @@ public final class appletviewer
 					// language string
 					configLine = configLine.substring(4);
 
-					k = configLine.indexOf('=');
+					int k = configLine.indexOf('=');
 					if (k != -1) {
 						String name = configLine.substring(0, k).trim().toLowerCase();
 						String value = configLine.substring(k + 1).trim();
-						if (name.startsWith("lang")) {
-							try {
-								Integer.parseInt(name.substring(4));
-								i++;
-							} catch (NumberFormatException ex) {
-							}
-						}
 						LanguageStrings.Set(name, value);
 						if (debug) {
 							System.out.println("Message - name=" + name + " text=" + value);
@@ -107,18 +95,18 @@ public final class appletviewer
 				} else if (configLine.startsWith("param=")) {
 					// config parameter
 					configLine = configLine.substring(6);
-					k = configLine.indexOf('=');
+					int k = configLine.indexOf('=');
 					if (k != -1) {
 						String name = configLine.substring(0, k).trim().toLowerCase();
 						String value = configLine.substring(k + 1).trim();
-						configOur.put(name, value);
+						configInner.put(name, value);
 						if (debug) {
-							System.out.println("Ourconfig - variable=" + name + " value=" + value);
+							System.out.println("Innerconfig - variable=" + name + " value=" + value);
 						}
 					}
 				} else {
 					// other config variables
-					k = configLine.indexOf('=');
+					int k = configLine.indexOf('=');
 					if (k == -1) {
 						// ignore invalid lines
 						continue;
@@ -126,9 +114,9 @@ public final class appletviewer
 
 					String name = configLine.substring(0, k).trim().toLowerCase();
 					String value = configLine.substring(k + 1).trim();
-					configInner.put(name, value);
+					configOur.put(name, value);
 					if (debug) {
-						System.out.println("Innerconfig - variable=" + name + " value=" + value);
+						System.out.println("Ourconfig - variable=" + name + " value=" + value);
 					}
 				}
 			}
@@ -150,68 +138,6 @@ public final class appletviewer
 				}
 			}
 		}
-
-		if (i > 0) {
-			var_1f88 = new int[i];
-			languageNames = new String[i];
-
-			do {
-				Enumeration localEnumeration = LanguageStrings.GetNames();
-				do {
-					if (!localEnumeration.hasMoreElements()) {
-						//break label729;
-						break;
-					}
-					Object localObject = (String)localEnumeration.nextElement();
-					if (!((String)localObject).startsWith("lang")) {
-						//break label724;
-						break;
-					}
-					k = 0;
-					try {
-						k = Integer.parseInt(((String)localObject).substring(4));
-					} catch (NumberFormatException ex) {
-					}
-				} while (!bool);
-
-				int str1 = 0;
-				Object localObject = null;
-				for (int str3 = 0; str3 < str1; str3++) {
-					if (((str3 ^ 0xFFFFFFFF) == (str1 ^ 0xFFFFFFFF)) || (var_1f88[str3] > k)) {
-						for (int str4 = str1; str4 > str3; str4--) {
-							languageNames[str4] = languageNames[str4 - 1];
-							var_1f88[str4] = var_1f88[str4 - 1];
-						}
-
-						var_1f88[str3] = k;
-						languageNames[str3] = LanguageStrings.Get((String)localObject);
-						if (!bool)
-							break;
-					}
-				}
-
-				label724:
-				++str1;
-			} while (!bool);
-
-			label729:
-			DialogLanguage.Create();
-			var_1f38 = new MenuBar();
-
-			Object localObject = new Menu(LanguageStrings.Get("options"));
-
-			MenuItem localMenuItem = new MenuItem(LanguageStrings.Get("language") + "...");
-			Class_f localClass_f = new Class_f();
-			localMenuItem.addActionListener(localClass_f);
-			((Menu)localObject).add(localMenuItem);
-			var_1f38.add((Menu)localObject);
-			MainFrame.setMenuBar(var_1f38);
-			if (Preferences.Get("Language") == null) {
-				return -1 < (sub_260c(true) ^ 0xFFFFFFFF);
-			}
-		}
-
-		return true;
 	}
 
   public final void componentHidden(ComponentEvent paramComponentEvent)
@@ -232,7 +158,7 @@ public final class appletviewer
     {
       return -1;
     }
-    Preferences.Set("Language", Integer.toString(var_1f88[i]));
+    Preferences.Set("Language", Integer.toString(_languageIds[i]));
     if (paramBoolean != true) {
       removeadvert();
     }
@@ -369,7 +295,7 @@ public final class appletviewer
 			System.out.println("Config URL is " + _configUrl);
 		}
 
-		sub_2026();
+		loadConfigValues();
 
 		String str3 = configOur.get("viewerversion");
 		if (str3 != null) {
