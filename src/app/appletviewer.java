@@ -304,7 +304,7 @@ public final class appletviewer
 			if (!_in64Bits) {
 				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
 				browserControlFile = getLocationForFile("browsercontrol.dll", cacheSubdir, l, homePath);
-				localObject4 = new Class_u(browserControlBinary).sub_ca1((byte)54, "browsercontrol.dll");
+				localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol.dll");
 				if (null == localObject4) {
 					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
@@ -314,7 +314,7 @@ public final class appletviewer
 			} else {
 				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
 				browserControlFile = getLocationForFile("browsercontrol64.dll", cacheSubdir, l, homePath);
-				localObject4 = new Class_u(browserControlBinary).sub_ca1((byte)54, "browsercontrol64.dll");
+				localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol64.dll");
 				if (null == localObject4) {
 					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));

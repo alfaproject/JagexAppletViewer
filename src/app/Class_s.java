@@ -23,7 +23,7 @@ final class Class_s extends ClassLoader
       return localClass;
     }
 
-    byte[] arrayOfByte = this.var_568.sub_ca1((byte)54, paramString + ".class");
+    byte[] arrayOfByte = this.var_568.sub_ca1(paramString + ".class");
     if (arrayOfByte != null)
     {
       localClass = defineClass(paramString, arrayOfByte, 0, arrayOfByte.length, this.var_560);

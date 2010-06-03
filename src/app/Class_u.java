@@ -20,7 +20,7 @@ final class Class_u {
 	private PKCS7 var_c79;
 	private byte[] var_c81;
 
-	final byte[] sub_ca1(byte paramByte, String paramString) {
+	final byte[] sub_ca1(String paramString) {
 		try {
 			byte[] arrayOfByte1 = (byte[])this.var_c61.remove(paramString);
 			if (null == arrayOfByte1) {
@@ -54,7 +54,7 @@ final class Class_u {
 			localMessageDigest2.update(arrayOfByte1);
 
 			byte[] arrayOfByte3 = localMessageDigest2.digest();
-			String str2 = Class_k.sub_23c(arrayOfByte3, paramByte + -145);
+			String str2 = Class_k.sub_23c(arrayOfByte3, -91);
 
 			if (!str2.equals(localClass_t1.var_c2)) {
 				return null;
@@ -86,9 +86,6 @@ final class Class_u {
 			ArrayList localArrayList = arrayOfSignerInfo[0].getCertificateChain(this.var_c79);
 			if (localArrayList.size() != 2) {
 				return null;
-			}
-			if (paramByte != 54) {
-				return (byte[])null;
 			}
 
 			for (int i = 0; i < localArrayList.size(); i++) {
