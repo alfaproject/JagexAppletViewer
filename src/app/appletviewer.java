@@ -45,7 +45,7 @@ public final class appletviewer
   private static ScrollPane var_1f50;
   private static Canvas var_1f58;
   static Hashtable var_1f60 = new Hashtable();
-  private static File var_1f68;
+  private static File _configFile;
   private static float var_1f70;
   private static float var_1f78 = 0.0F;
   private static String var_1f80;
@@ -72,7 +72,7 @@ public final class appletviewer
 		int k = 0;
 		try {
 			String str4;
-			BufferedReader localBufferedReader = sub_2562(93);
+			BufferedReader localBufferedReader = sub_2562();
 
 			do {
 				do {
@@ -220,16 +220,13 @@ public final class appletviewer
   {
   }
 
-  private static final BufferedReader sub_2562(int paramInt)
-    throws IOException
-  {
-    if (var_1f80 != null) {
-      return new BufferedReader(new InputStreamReader(new URL(var_1f80).openStream()));
-    }
+	private static final BufferedReader sub_2562() throws IOException {
+		if (var_1f80 != null) {
+			return new BufferedReader(new InputStreamReader(new URL(var_1f80).openStream()));
+		}
 
-    int i = -39 % ((paramInt - 29) / 52);
-    return new BufferedReader(new FileReader(var_1f68));
-  }
+		return new BufferedReader(new FileReader(_configFile));
+	}
 
   static final int sub_260c(boolean paramBoolean)
   {
@@ -355,26 +352,29 @@ public final class appletviewer
 			}
 		}
 
+		// load 'loading' window
 		LoaderBox.Create();
 
+		// load config file
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_config"));
-		Object localObject3 = System.getProperty("com.jagex.config");
 
-		String str2 = System.getProperty("com.jagex.configfile");
-		if (null == localObject3) {
-			if (str2 == null) {
+		String configUrl = System.getProperty("com.jagex.config");
+		String configFile = System.getProperty("com.jagex.configfile");
+
+		if (configUrl == null) {
+			if (configFile == null) {
 				DialogFactory.ShowError(LanguageStrings.Get("err_missing_config"));
 			}
-			var_1f68 = new File(resourcesPath, str2);
+			_configFile = new File(resourcesPath, configFile);
 		}
-		//label670:
+
 		int k;
 		int i = 0;
 		do {
 			String str1 = null;
 			do {
-				if (localObject3 != null) {
-					var_1f80 = sub_34ed(-1, (String)localObject3);
+				if (configUrl != null) {
+					var_1f80 = sub_34ed(-1, configUrl);
 					System.out.println("Config URL is " + var_1f80);
 
 					String str3 = var_1f80.toLowerCase();
@@ -779,17 +779,10 @@ public final class appletviewer
     return arrayOfByte2;
   }
 
-  static
-  {
-    var_1f70 = 58988.0F;
+	static {
+		var_1f70 = 58988.0F;
+		_configFile = null;
+		var_1f80 = null;
+	}
 
-    var_1f68 = null;
-
-    var_1f80 = null;
-  }
-}
-
-/* Location:           C:\Windows\.jagex_cache_32\jagexlauncher\bin\jagexappletviewer\
- * Qualified Name:     app.appletviewer
- * JD-Core Version:    0.5.4
- */
+} //class appletviewer
