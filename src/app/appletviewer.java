@@ -23,7 +23,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.Enumeration;
@@ -36,7 +35,7 @@ public final class appletviewer
 {
   private static Panel var_1f08;
   private static Component var_1f10;
-  static boolean var_1f18 = false;
+  static boolean debug = false;
   private static Applet var_1f20;
   static Hashtable var_1f28 = new Hashtable();
   static boolean var_1f30;
@@ -103,7 +102,7 @@ public final class appletviewer
 								}
 							}
 							LanguageStrings.Set(str2, str4);
-							if (var_1f18) {
+							if (debug) {
 								System.out.println("Message - name=" + str2 + " text=" + str4);
 							}
 						}
@@ -118,7 +117,7 @@ public final class appletviewer
 
 						str4 = ((String)localObject).substring(k - -1).trim();
 						var_1f28.put(str2, str4);
-						if (var_1f18) {
+						if (debug) {
 							System.out.println("Ourconfig - variable=" + str2 + " value=" + str4);
 						}
 					}
@@ -137,7 +136,7 @@ public final class appletviewer
 
 				str4 = ((String)localObject).substring(k + 1).trim();
 				var_1f60.put(str2, str4);
-				if (!var_1f18)
+				if (!debug)
 					continue;
 				System.out.println("Innerconfig - variable=" + str2 + " value=" + str4);
 			} while (!bool);
@@ -145,12 +144,12 @@ public final class appletviewer
 			label469:
 			localBufferedReader.close();
 		} catch (IOException localIOException) {
-			if (var_1f18) {
+			if (debug) {
 				localIOException.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_load_config"));
 		} catch (Exception localException) {
-			if (var_1f18) {
+			if (debug) {
 				localException.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_decode_config"));
@@ -302,7 +301,7 @@ public final class appletviewer
               }
             }
           } catch (Exception localException1) {
-            if (var_1f18)
+            if (debug)
               System.out.println("Unable to open/write: " + str1);
             try
             {
@@ -322,7 +321,7 @@ public final class appletviewer
 
       ++i; } while (!bool);
 
-    if (!var_1f18) {
+    if (!debug) {
       throw new RuntimeException();
     }
     throw new RuntimeException("Fatal - could not find ANY location for file: " + paramString1);
@@ -330,10 +329,10 @@ public final class appletviewer
 
 	public static final void Load(String resourcesFolder) {
 		boolean bool = Preferences.dummy;
-		var_1f18 = Boolean.getBoolean("com.jagex.debug");
-		if (var_1f18) {
-			System.setErr(Class_q.sub_5f3("Jagex host console", true));
-			System.setOut(Class_q.sub_5f3("Jagex host console", true));
+		debug = Boolean.getBoolean("com.jagex.debug");
+		if (debug) {
+			System.setErr(DialogDebug.GetInstance("Jagex host console"));
+			System.setOut(DialogDebug.GetInstance("Jagex host console"));
 			System.out.println("release #7");
 			System.out.println("java.version = " + System.getProperty("java.version"));
 			System.out.println("os.name = " + System.getProperty("os.name"));
@@ -456,7 +455,7 @@ public final class appletviewer
 					if (0 != (i1 ^ 0xFFFFFFFF)) {
 						str3 = str3.substring(0, i1);
 					}
-					if (var_1f18) {
+					if (debug) {
 						System.out.println("Domain: " + str3);
 					}
 					if ((!str3.endsWith(".runescape.com")) && (!str3.endsWith(".funorb.com"))) {
@@ -524,7 +523,7 @@ public final class appletviewer
 					}
 
 					sub_3774((byte[])localObject4, false, localFile);
-					if (var_1f18) {
+					if (debug) {
 						System.out.println("dlldata : " + arrayOfByte1.length);
 					}
 				}
@@ -541,7 +540,7 @@ public final class appletviewer
 				sub_3774((byte[])localObject4, false, localFile);
 			}
 		} catch (Exception localException2) {
-			if (var_1f18) {
+			if (debug) {
 				localException2.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_load_bc"));
@@ -555,11 +554,11 @@ public final class appletviewer
 			byte[] arrayOfByte2 = sub_3a29((String)var_1f28.get("loader_jar"), -1, str5);
 			localObject4 = new Class_s(arrayOfByte2);
 			var_1f20 = (Applet)((Class_s)localObject4).loadClass("loader").newInstance();
-			if (var_1f18) {
+			if (debug) {
 				System.out.println("loader_jar : " + arrayOfByte2.length);
 			}
 		} catch (Exception localException3) {
-			if (var_1f18) {
+			if (debug) {
 				localException3.printStackTrace();
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_target_applet"));
@@ -617,7 +616,7 @@ public final class appletviewer
 				browsercontrol.create(var_1f58, (String)var_1f28.get("adverturl"));
 				browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
 			} catch (Throwable localThrowable) {
-				if (var_1f18) {
+				if (debug) {
 					localThrowable.printStackTrace();
 				}
 				DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
@@ -704,7 +703,7 @@ public final class appletviewer
       browsercontrol.create(var_1f58, (String)var_1f28.get("adverturl"));
       browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
     } catch (Throwable localThrowable) {
-      if (var_1f18) {
+      if (debug) {
         localThrowable.printStackTrace();
       }
       DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
@@ -729,7 +728,7 @@ public final class appletviewer
       localFileOutputStream.close();
       return true;
     } catch (IOException localIOException) {
-      if (var_1f18)
+      if (debug)
       {
         localIOException.printStackTrace();
       }
@@ -824,7 +823,7 @@ public final class appletviewer
 
       localInputStream.close();
     } catch (Exception localException) {
-      if (var_1f18)
+      if (debug)
       {
         localException.printStackTrace();
       }
