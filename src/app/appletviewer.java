@@ -160,82 +160,58 @@ public final class appletviewer
 	public final void componentShown(ComponentEvent paramComponentEvent) {
 	}
 
-  private static final File sub_26a2(String paramString1, boolean paramBoolean, String paramString2, int paramInt, String paramString3)
-  {
-    boolean bool = Preferences.dummy; String[] arrayOfString1 = { "c:/rscache/", "/rscache/", "c:/windows/", "c:/winnt/", "c:/", paramString3, "/tmp/", "" };
-    String[] arrayOfString2 = { ".jagex_cache_" + paramInt, ".file_store_" + paramInt };
+	private static final File getLocationForFile(String fileName, String cacheSubdir, int mode, String homeDir) {
+		String[] dirs = { "c:/rscache/", "/rscache/", "c:/windows/", "c:/winnt/", "c:/", homeDir, "/tmp/", "" };
+		String[] subDirs = { ".jagex_cache_" + mode, ".file_store_" + mode };
 
-    int i = 0;
-    if (paramBoolean)
-      return (File)null;
-    do {
-      if (i >= 2) {
-        break;
-      }
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < subDirs.length; j++) {
+				for (int k = 0; k < dirs.length; k++) {
+					String filePath = dirs[k] + subDirs[j] + "/" + (cacheSubdir == null ? "" : cacheSubdir + "/") + fileName;
+					RandomAccessFile dummyFile = null;
+					try {
+						File file = new File(filePath);
+						if ((i == 1) || file.exists()) {
+							String dir = dirs[k];
+							if ((i == 0) || (dir.length() == 0) || (new File(dir).exists())) {
+								new File(dirs[k] + subDirs[j]).mkdir();
+								if (cacheSubdir != null) {
+									new File(dirs[k] + subDirs[j] + "/" + cacheSubdir).mkdir();
+								}
 
-      int j = 0;
-      do { if (arrayOfString2.length <= j) {
-          break;
-        }
+								// check if this file is read/write-able
+								dummyFile = new RandomAccessFile(file, "rw");
+								int l = dummyFile.read();
+								dummyFile.seek(0L);
+								dummyFile.write(l);
+								dummyFile.seek(0L);
+								dummyFile.close();
 
-        int k = 0;
-        do { if ((arrayOfString1.length ^ 0xFFFFFFFF) >= (k ^ 0xFFFFFFFF)) {
-            break;
-          }
+								// looks like it is, return the path
+								return file;
+							}
+						}
+					} catch (Exception ex) {
+						if (debug) {
+							System.out.println("Unable to open/write: " + filePath);
+						}
+						try {
+							if (dummyFile != null) {
+								dummyFile.close();
+								dummyFile = null;
+							}
+						} catch (IOException ioEx) {
+						}
+					}
+				}
+			}
+		}
 
-          String str1 = arrayOfString1[k] + arrayOfString2[j] + "/" + ((paramString2 == null) ? "" : new StringBuffer().append(paramString2).append("/").toString()) + paramString1;
-          RandomAccessFile localRandomAccessFile = null;
-          try
-          {
-            File localFile = new File(str1);
-            if ((-1 != (i ^ 0xFFFFFFFF)) || (localFile.exists()) || 
-              (bool))
-            {
-              String str2 = arrayOfString1[k];
-              if ((i != 1) || (0 >= str2.length()) || (new File(str2).exists()) || 
-                (bool))
-              {
-                new File(arrayOfString1[k] + arrayOfString2[j]).mkdir();
-                if (null != paramString2)
-                {
-                  new File(arrayOfString1[k] + arrayOfString2[j] + "/" + paramString2).mkdir();
-                }
-                localRandomAccessFile = new RandomAccessFile(localFile, "rw");
-
-                int l = localRandomAccessFile.read();
-                localRandomAccessFile.seek(0L);
-                localRandomAccessFile.write(l);
-                localRandomAccessFile.seek(0L);
-                localRandomAccessFile.close();
-                return localFile;
-              }
-            }
-          } catch (Exception localException1) {
-            if (debug)
-              System.out.println("Unable to open/write: " + str1);
-            try
-            {
-              if (localRandomAccessFile != null)
-              {
-                localRandomAccessFile.close();
-                localRandomAccessFile = null;
-              }
-            }
-            catch (Exception localException2)
-            {
-            }
-          }
-          ++k; } while (!bool);
-
-        ++j; } while (!bool);
-
-      ++i; } while (!bool);
-
-    if (!debug) {
-      throw new RuntimeException();
-    }
-    throw new RuntimeException("Fatal - could not find ANY location for file: " + paramString1);
-  }
+		if (!debug) {
+			throw new RuntimeException();
+		}
+		throw new RuntimeException("Fatal - could not find ANY location for file: " + fileName);
+	}
 
 	public static final void Load(String resourcesName) {
 		boolean bool = Preferences.dummy;
@@ -321,32 +297,30 @@ public final class appletviewer
 
 		// load browser control
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
-		File localFile = null;
+		File browserControlFile = null;
 		Object localObject4;
 		try {
 			byte[] browserControlBinary;
 			if (!_in64Bits) {
 				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
-
-				localFile = sub_26a2("browsercontrol.dll", false, cacheSubdir, l, homePath);
+				browserControlFile = getLocationForFile("browsercontrol.dll", cacheSubdir, l, homePath);
 				localObject4 = new Class_u(browserControlBinary).sub_ca1((byte)54, "browsercontrol.dll");
 				if (null == localObject4) {
-					localFile = null;
+					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
 				}
 
-				sub_3774((byte[])localObject4, false, localFile);
+				sub_3774((byte[])localObject4, false, browserControlFile);
 			} else {
 				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
-				localFile = sub_26a2("browsercontrol64.dll", false, cacheSubdir, l, homePath);
-
+				browserControlFile = getLocationForFile("browsercontrol64.dll", cacheSubdir, l, homePath);
 				localObject4 = new Class_u(browserControlBinary).sub_ca1((byte)54, "browsercontrol64.dll");
 				if (null == localObject4) {
-					localFile = null;
+					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
 				}
 
-				sub_3774((byte[])localObject4, false, localFile);
+				sub_3774((byte[])localObject4, false, browserControlFile);
 			}
 			if (debug) {
 				System.out.println("dlldata : " + browserControlBinary.length);
@@ -425,7 +399,7 @@ public final class appletviewer
 			} while (!bool);
 			try {
 				label1817:
-				System.load(localFile.toString());
+				System.load(browserControlFile.toString());
 				browsercontrol.create(var_1f58, configOur.get("adverturl"));
 				browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
 			} catch (Throwable localThrowable) {
