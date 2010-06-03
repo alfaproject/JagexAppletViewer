@@ -327,7 +327,7 @@ public final class appletviewer
     throw new RuntimeException("Fatal - could not find ANY location for file: " + paramString1);
   }
 
-	public static final void Load(String resourcesFolder) {
+	public static final void Load(String resourcesName) {
 		boolean bool = Preferences.dummy;
 		debug = Boolean.getBoolean("com.jagex.debug");
 		if (debug) {
@@ -340,94 +340,38 @@ public final class appletviewer
 		}
 
 		Preferences.Load();
-
-		String str1 = Preferences.Get("Language");
-
-		int i = 0;
-		if (null != str1) {
-			i = Integer.parseInt(str1);
-			if (!bool) {
-				//break label382;
-			}
-		}
-
-		Object localObject1 = Locale.getDefault();
-		Object localObject2 = ((Locale)localObject1).getISO3Language();
-
-		Object localObject3 = ((Locale)localObject1).getISO3Country();
-
-		int j = -1;
-		if (null == localObject2) {
-			if (null == localObject3) {
-				//break label357;
-			}
-			if ((((String)localObject3).equals("GB")) || (((String)localObject3).equals("US"))) {
-				j = 0;
-			}
-			if (((String)localObject3).equals("DE")) {
-				j = 1;
-			}
-			if (((String)localObject3).equals("FR")) {
-				j = 2;
-			}
-			if (!((String)localObject3).equals("BR")) {
-				//break label357;
-			}
-			j = 3;
-			if (!bool) {
-				//break label357;
-			}
-		}
-
-		if (((String)localObject2).equals("eng")) {
-			j = 0;
-		}
-		if ((((String)localObject2).equals("ger")) || (((String)localObject2).equals("deu"))) {
-			j = 1;
-		}
-		if ((((String)localObject2).equals("fre")) || (((String)localObject2).equals("fra"))) {
-			j = 2;
-		}
-		if (((String)localObject2).equals("por")) {
-			j = 3;
-		}
-
-		if (j >= 0) {
-			label357:
-			Preferences.Set("Language", Integer.toString(j));
-			Preferences.Save();
-		}
-
-		label382:
 		LanguageStrings.Load();
 
 		MainFrame = new Frame();
 
-		localObject1 = new File(new File(System.getProperty("user.dir")).getParentFile(), resourcesFolder);
-		localObject2 = new File((File)localObject1, "jagexappletviewer.png");
-		System.out.println("Trying to load icon file: " + ((File)localObject2).getAbsolutePath());
-		if (((File)localObject2).exists()) {
-			localObject3 = Toolkit.getDefaultToolkit().getImage(((File)localObject2).getAbsolutePath());
-			if (localObject3 != null) {
-				MainFrame.setIconImage((Image)localObject3);
+		// load window icon
+		File resourcesPath = new File(new File(System.getProperty("user.dir")).getParentFile(), resourcesName);
+		File iconPath = new File(resourcesPath, "jagexappletviewer.png");
+		System.out.println("Trying to load icon file: " + iconPath.getAbsolutePath());
+		if (iconPath.exists()) {
+			Image icon = Toolkit.getDefaultToolkit().getImage(iconPath.getAbsolutePath());
+			if (icon != null) {
+				MainFrame.setIconImage(icon);
 			}
 		}
 
 		LoaderBox.Create();
 
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_config"));
-		localObject3 = System.getProperty("com.jagex.config");
+		Object localObject3 = System.getProperty("com.jagex.config");
 
 		String str2 = System.getProperty("com.jagex.configfile");
 		if (null == localObject3) {
 			if (str2 == null) {
 				DialogFactory.ShowError(LanguageStrings.Get("err_missing_config"));
 			}
-			var_1f68 = new File((File)localObject1, str2);
+			var_1f68 = new File(resourcesPath, str2);
 		}
 		//label670:
 		int k;
+		int i = 0;
 		do {
+			String str1 = null;
 			do {
 				if (localObject3 != null) {
 					var_1f80 = sub_34ed(-1, (String)localObject3);
