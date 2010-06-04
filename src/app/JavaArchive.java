@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 import sun.security.pkcs.PKCS7;
 import sun.security.pkcs.SignerInfo;
 
-final class ZippedFile {
+final class JavaArchive {
 
 	private Hashtable<String, byte[]> _files = new Hashtable<String, byte[]>();
 	private Hashtable<String, Manifest> _manifests = new Hashtable<String, Manifest>();
@@ -20,108 +20,107 @@ final class ZippedFile {
 	private PKCS7 _publicKey;
 	private byte[] _zigbertData;
 
-	final byte[] Extract(String paramString) {
+	final byte[] ExtractAndValidate(String fileName) {
 		try {
-			byte[] arrayOfByte1 = _files.remove(paramString);
-			if (null == arrayOfByte1) {
+			byte[] fileData = _files.remove(fileName);
+			if (fileData == null) {
 				return null;
 			}
 
-			Manifest localClass_t1 = _manifests.get(paramString);
-			if (null == localClass_t1) {
+			Manifest manifest = _manifests.get(fileName);
+			if (manifest == null) {
 				return null;
 			}
 
-			Manifest localClass_t2 = _zigberts.get(paramString);
-			if (null == localClass_t2) {
+			Manifest zigbert = _zigberts.get(fileName);
+			if (zigbert == null) {
 				return null;
 			}
 
-			MessageDigest localMessageDigest1 = MessageDigest.getInstance("MD5");
-			localMessageDigest1.reset();
+			// initialize md5 and sha1 engines
+			MessageDigest md5 = MessageDigest.getInstance("MD5");
+			MessageDigest sha1 = MessageDigest.getInstance("SHA");
 
-			localMessageDigest1.update(arrayOfByte1);
-
-			byte[] arrayOfByte2 = localMessageDigest1.digest();
-			String str1 = Class_k.sub_23c(arrayOfByte2, -100);
-
-			if (!str1.equals(localClass_t1.MD5Digest)) {
+			// validate md5 hash of file data
+			md5.reset();
+			md5.update(fileData);
+			byte[] rawMd5Hash = md5.digest();
+			String md5Hash = Class_k.sub_23c(rawMd5Hash);
+			if (!md5Hash.equals(manifest.MD5Digest)) {
 				return null;
 			}
 
-			MessageDigest localMessageDigest2 = MessageDigest.getInstance("SHA");
-			localMessageDigest2.reset();
-			localMessageDigest2.update(arrayOfByte1);
-
-			byte[] arrayOfByte3 = localMessageDigest2.digest();
-			String str2 = Class_k.sub_23c(arrayOfByte3, -91);
-
-			if (!str2.equals(localClass_t1.SHA1Digest)) {
-				return null;
-			}
-			localMessageDigest1.reset();
-
-			localMessageDigest1.update(localClass_t1.RawData);
-			arrayOfByte2 = localMessageDigest1.digest();
-			str1 = Class_k.sub_23c(arrayOfByte2, -120);
-
-			if (!str1.equals(localClass_t2.MD5Digest)) {
+			// validate sha hash of file data
+			sha1.reset();
+			sha1.update(fileData);
+			byte[] rawSha1Hash = sha1.digest();
+			String sha1Hash = Class_k.sub_23c(rawSha1Hash);
+			if (!sha1Hash.equals(manifest.SHA1Digest)) {
 				return null;
 			}
 
-			localMessageDigest2.reset();
-			localMessageDigest2.update(localClass_t1.RawData);
-			arrayOfByte3 = localMessageDigest2.digest();
-
-			str2 = Class_k.sub_23c(arrayOfByte3, -111);
-			if (!str2.equals(localClass_t2.SHA1Digest)) {
+			// validate md5 hash of manifest data
+			md5.reset();
+			md5.update(manifest.RawData);
+			rawMd5Hash = md5.digest();
+			md5Hash = Class_k.sub_23c(rawMd5Hash);
+			if (!md5Hash.equals(zigbert.MD5Digest)) {
 				return null;
 			}
 
-			SignerInfo[] arrayOfSignerInfo = _publicKey.verify(_zigbertData);
-			if ((arrayOfSignerInfo == null) || ((arrayOfSignerInfo.length ^ 0xFFFFFFFF) == -1)) {
+			// validate sha1 hash of manifest data
+			sha1.reset();
+			sha1.update(manifest.RawData);
+			rawSha1Hash = sha1.digest();
+			sha1Hash = Class_k.sub_23c(rawSha1Hash);
+			if (!sha1Hash.equals(zigbert.SHA1Digest)) {
 				return null;
 			}
 
-			ArrayList localArrayList = arrayOfSignerInfo[0].getCertificateChain(_publicKey);
-			if (localArrayList.size() != 2) {
+			// validate authenticy of zigbert data
+			SignerInfo[] signers = _publicKey.verify(_zigbertData);
+			if ((signers == null) || (signers.length == 0)) {
 				return null;
 			}
 
-			for (int i = 0; i < localArrayList.size(); i++) {
-				X509Certificate localX509Certificate = (X509Certificate)localArrayList.get(i);
-				String str3 = localX509Certificate.getSerialNumber().toString();
+			ArrayList<X509Certificate> certificates = signers[0].getCertificateChain(_publicKey);
+			if (certificates.size() != 2) {
+				return null;
+			}
 
-				byte[] arrayOfByte4 = localX509Certificate.getPublicKey().getEncoded();
+			for (int i = 0; i < certificates.size(); i++) {
+				X509Certificate certificate = certificates.get(i);
+				String certSerialNo = certificate.getSerialNumber().toString();
+				byte[] certPubKeyRaw = certificate.getPublicKey().getEncoded();
+				String certPubKey = Class_k.sub_23c(certPubKeyRaw);
 
-				String str4 = Class_k.sub_23c(arrayOfByte4, 89);
 				if (i == 0) {
-					if (!str3.equals("105014014184937810784491209018632141624")) {
+					if (!certSerialNo.equals("105014014184937810784491209018632141624")) {
 						return null;
 					}
-					if (!str4.equals("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxehHTKQFiy/+t7xlQ0UYmmpQyoohClLm5Gfcy9hqwSps8riRS4LH4F3Ii9XnPYYC85R0wMfsfFCQlqgPbHK4X2iuUNw/bAT8jVHeIAIHPrxBaBqIzq92CHfGmLDDWEMQh+R5EpKW6caR0HB38c/eNYce5Do8DwOIMI/tC0LTcfjkgSjB2G19pT38W/ra1XwFVZR3fL/vvUGPiNDdcCcQCniPjYE1wLI/y9iNDfPcEnL92rhq3g5WVYrZ/CAXHAdQ9wCGBRyRgtVM1AjWYranZI9fNj+h/KjRDa+Fsu+k5gKLiKRNz9PGk+mmrBFOWOWMCsjyOalnkkx+N1/Gh4KcRwIDAQAB")) {
+					if (!certPubKey.equals("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxehHTKQFiy/+t7xlQ0UYmmpQyoohClLm5Gfcy9hqwSps8riRS4LH4F3Ii9XnPYYC85R0wMfsfFCQlqgPbHK4X2iuUNw/bAT8jVHeIAIHPrxBaBqIzq92CHfGmLDDWEMQh+R5EpKW6caR0HB38c/eNYce5Do8DwOIMI/tC0LTcfjkgSjB2G19pT38W/ra1XwFVZR3fL/vvUGPiNDdcCcQCniPjYE1wLI/y9iNDfPcEnL92rhq3g5WVYrZ/CAXHAdQ9wCGBRyRgtVM1AjWYranZI9fNj+h/KjRDa+Fsu+k5gKLiKRNz9PGk+mmrBFOWOWMCsjyOalnkkx+N1/Gh4KcRwIDAQAB")) {
 						return null;
 					}
 				}
 
-				if (-2 == (i ^ 0xFFFFFFFF)) {
-					if (!str3.equals("10")) {
+				if (i == 1) {
+					if (!certSerialNo.equals("10")) {
 						return null;
 					}
-					if (!str4.equals("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDGuLknYK8L45FpZdt+je2R5qrxvtXt/m3ULH/RcHf7JplXtN0/MLjcIepojYGS/C5LkTWEIPLaSrq0/ObaiPIgxSGSCUeVoAkcpnm+sUwd/PGKblTSaaHxTJM6Qf591GR7Y0X3YGAdMR2k6dMPi/tuJiSzqP/l5ZDUtMLcUGCuWQIDAQAB"))
+					if (!certPubKey.equals("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDGuLknYK8L45FpZdt+je2R5qrxvtXt/m3ULH/RcHf7JplXtN0/MLjcIepojYGS/C5LkTWEIPLaSrq0/ObaiPIgxSGSCUeVoAkcpnm+sUwd/PGKblTSaaHxTJM6Qf591GR7Y0X3YGAdMR2k6dMPi/tuJiSzqP/l5ZDUtMLcUGCuWQIDAQAB"))
 						return null;
 				}
 			}
 
-			return arrayOfByte1;
-		} catch (Exception localException) {
-			localException.printStackTrace();
-			DialogFactory.ShowError(LanguageStrings.Get("err_get_file") + ":" + paramString + " [" + localException.toString() + "]");
+			return fileData;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			DialogFactory.ShowError(LanguageStrings.Get("err_get_file") + ":" + fileName + " [" + ex.toString() + "]");
 		}
 		return null;
 	}
 
-	ZippedFile(byte[] zippedData) throws IOException {
+	JavaArchive(byte[] zippedData) throws IOException {
 		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zippedData));
 
 		ZipEntry zipEntry;

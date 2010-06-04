@@ -13,12 +13,12 @@ final class ClassLoaderZipFile
 {
 	private Hashtable<String, Class> _classes = new Hashtable<String, Class>();
 	private ProtectionDomain _protectionDomain;
-	private ZippedFile _zippedFile;
+	private JavaArchive _zippedFile;
 
 	ClassLoaderZipFile(byte[] zippedBinary) throws IOException {
 		super(ClassLoaderZipFile.class.getClassLoader());
 
-		_zippedFile = new ZippedFile(zippedBinary);
+		_zippedFile = new JavaArchive(zippedBinary);
 
 		CodeSource codeSource = new CodeSource(null, (Certificate[])null);
 		Permissions permissions = new Permissions();
@@ -45,7 +45,7 @@ final class ClassLoaderZipFile
 		// all else failed, let's try to load it from zip file
 		try {
 			// load class data from zipped binary and save in byte array
-			byte[] classData = _zippedFile.Extract(name + ".class");
+			byte[] classData = _zippedFile.ExtractAndValidate(name + ".class");
 
 			// convert byte array to class
 			cl = defineClass(name, classData, 0, classData.length, _protectionDomain);

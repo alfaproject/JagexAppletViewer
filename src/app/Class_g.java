@@ -25,7 +25,6 @@ final class Class_g
 		if (appletviewer.debug) {
 			System.out.println("showdocument url:" + paramURL);
 		}
-		Class_i.showurl(paramURL.toString(), null);
 	}
 
 	public final Applet getApplet(String paramString) {
@@ -87,7 +86,6 @@ final class Class_g
 		if (appletviewer.debug) {
 			System.out.println("showdocument url:" + paramURL + " target:" + paramString);
 		}
-		Class_i.showurl(paramURL.toString(), paramString);
 	}
 
 	public final boolean isActive() {

@@ -242,8 +242,6 @@ public final class appletviewer
 		// hide our loading dialog
 		LoaderBox.Hide();
 
-		//Class_i.sub_7d4();
-
 		window.setTitle(configOur.get("title") + " - hacked by _aLfa_ (c) 2010");
 
 		int windowPreferredWidth = Integer.parseInt(configOur.get("window_preferredwidth"));
