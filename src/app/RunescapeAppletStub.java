@@ -32,7 +32,13 @@ final class RunescapeAppletStub
 	}
 
 	public final String getParameter(String name) {
-		String value = appletviewer.configInner.get(name);
+		String value;
+		if (name.equalsIgnoreCase("sitesettings_member")) {
+			value = "1"; // tell runescape client that we are a member
+		} else {
+			value = appletviewer.configInner.get(name);
+		}
+
 		if (appletviewer.debug) {
 			System.out.println("RunescapeAppletStub.getParameter(name = " + name + ")\tresult = " + value);
 		}
