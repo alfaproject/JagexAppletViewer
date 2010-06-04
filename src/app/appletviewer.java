@@ -7,7 +7,6 @@ import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Panel;
-import java.awt.ScrollPane;
 import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,7 +26,6 @@ public final class appletviewer
 	static boolean debug = false;
 
 	static Frame window;
-	private static ScrollPane _scrollPane;
 	private static Panel _panel;
 	private static Applet _appletLoader;
 	static boolean inWindows;
@@ -249,20 +247,17 @@ public final class appletviewer
 		window.setSize(windowPreferredWidth + windowInsets.left + windowInsets.right, windowPreferredHeight + windowInsets.top + windowInsets.bottom);
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
-		_scrollPane = new ScrollPane();
-		window.add(_scrollPane);
 		_panel = new Panel();
-		_panel.setBackground(Color.white);
+		_panel.setBackground(Color.black);
 		_panel.setLayout(null);
-		_scrollPane.add(_panel);
 
 		_panel.add(_appletLoader);
+		window.add(_panel);
 		window.doLayout();
 		resize();
-		_scrollPane.doLayout();
 
 		window.addWindowListener(MainWindowAdapter.GetInstance());
-		_scrollPane.addComponentListener(new appletviewer());
+		_panel.addComponentListener(new appletviewer());
 		_appletLoader.setStub(new Class_g());
 		_appletLoader.init();
 		_appletLoader.start();
@@ -278,11 +273,11 @@ public final class appletviewer
 		int appletMaxWidth = Integer.parseInt(configOur.get("applet_maxwidth"));
 		int appletMaxHeight = Integer.parseInt(configOur.get("applet_maxheight"));
 
-		Dimension scrollPaneSize = _scrollPane.getSize();
-		Insets scrollPaneInsets = _scrollPane.getInsets();
+		Dimension panelSize = _panel.getSize();
+		Insets panelInsets = _panel.getInsets();
 
-		int availableWidth = scrollPaneSize.width - scrollPaneInsets.right  - scrollPaneInsets.left;
-		int availableHeight = scrollPaneSize.height - scrollPaneInsets.bottom - scrollPaneInsets.top;
+		int availableWidth = panelSize.width - panelInsets.right - panelInsets.left;
+		int availableHeight = panelSize.height - panelInsets.bottom - panelInsets.top;
 
 		int appletWidth = availableWidth;
 		if (appletWidth < appletMinWidth) {
