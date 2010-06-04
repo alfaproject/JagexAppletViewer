@@ -1,6 +1,5 @@
 package netscape.javascript;
 
-import app.appletviewer;
 import app.Preferences;
 import java.applet.Applet;
 
@@ -12,11 +11,9 @@ public class JSObjec_ {
 		if (paramString.equals("zap")) {
 			Preferences.Set("Member", "yes");
 			Preferences.Save();
-			appletviewer.removeadvert();
 		} else if (paramString.equals("unzap")) {
 			Preferences.Set("Member", "no");
 			Preferences.Save();
-			appletviewer.readdadvert();
 		}
 
 		return null;

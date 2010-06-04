@@ -45,12 +45,12 @@ final class LoaderBox
 		_progressBar._font = new Font("Helvetica", 1, 13);
 		_progressBar._fontMetrics = _progressBar.getFontMetrics(_progressBar._font);
 
-		_dialog = new Dialog(appletviewer.MainFrame, "Jagex Ltd.", false);
+		_dialog = new Dialog(appletviewer.window, "Jagex Ltd.", false);
 		_dialog.add(_progressBar);
 		_dialog.addWindowListener(MainWindowAdapter.GetInstance());
 		_dialog.setResizable(false);
 		_dialog.setSize(320, 100);
-		_dialog.setLocationRelativeTo(appletviewer.MainFrame);
+		_dialog.setLocationRelativeTo(appletviewer.window);
 		_dialog.setVisible(true);
 	}
 

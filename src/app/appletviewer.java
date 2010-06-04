@@ -1,7 +1,6 @@
 package app;
 
 import java.applet.Applet;
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -28,19 +27,18 @@ import nativeadvert.browsercontrol;
 public final class appletviewer
 		implements ComponentListener
 {
-	private static Panel var_1f08;
-	private static Component var_1f10;
+
 	static boolean debug = false;
+
+	static Frame window;
+	private static ScrollPane _scrollPane;
+	private static Panel _panel;
+	private static Component var_1f10;
 	private static Applet _appletLoader;
 	static boolean inWindows;
 	private static boolean _in64Bits;
-	static Frame MainFrame;
-	private static ScrollPane var_1f50;
-	private static Canvas var_1f58;
 	private static float var_1f70;
 	private static float var_1f78 = 0.0F;
-	private static int[] _languageIds;
-	static String[] languageNames;
 	public static int var_1fa0;
 	public static int var_1fa8;
 	public static boolean var_1fb0;
@@ -144,19 +142,6 @@ public final class appletviewer
 		return new BufferedReader(new FileReader(_configFile));
 	}
 
-	static final int sub_260c(boolean paramBoolean) {
-		int i = DialogLanguage.GetChoiceIndex();
-		if (i < 0) {
-			return -1;
-		}
-		Preferences.Set("Language", Integer.toString(_languageIds[i]));
-		if (paramBoolean != true) {
-			removeadvert();
-		}
-		Preferences.Save();
-		return i;
-	}
-
 	public final void componentShown(ComponentEvent paramComponentEvent) {
 	}
 
@@ -214,7 +199,6 @@ public final class appletviewer
 	}
 
 	public static final void Load(String resourcesName) {
-		boolean bool = Preferences.dummy;
 		debug = Boolean.getBoolean("com.jagex.debug");
 		if (debug) {
 			System.setErr(DialogDebug.GetInstance("Jagex host console"));
@@ -228,7 +212,7 @@ public final class appletviewer
 		Preferences.Load();
 		LanguageStrings.Load();
 
-		MainFrame = new Frame();
+		window = new Frame();
 
 		// load window icon
 		File resourcesPath = new File(new File(System.getProperty("user.dir")).getParentFile(), resourcesName);
@@ -237,7 +221,7 @@ public final class appletviewer
 		if (iconPath.exists()) {
 			Image icon = Toolkit.getDefaultToolkit().getImage(iconPath.getAbsolutePath());
 			if (icon != null) {
-				MainFrame.setIconImage(icon);
+				window.setIconImage(icon);
 			}
 		}
 
@@ -353,109 +337,39 @@ public final class appletviewer
 
 		// hide our loading dialog
 		LoaderBox.Hide();
-		Class_i.sub_7d4();
 
-		MainFrame.setTitle(configOur.get("title"));
-		int i2 = (inWindows ? Integer.parseInt(configOur.get("advert_height")) : 0);
+		//Class_i.sub_7d4();
 
-		int i3 = Integer.parseInt(configOur.get("window_preferredwidth"));
+		window.setTitle(configOur.get("title") + " - hacked by _aLfa_ (c) 2010");
 
-		int i4 = Integer.parseInt(configOur.get("window_preferredheight"));
-		int i5 = 40;
+		int advertHeight = (inWindows ? Integer.parseInt(configOur.get("advert_height")) : 0);
+		int windowPreferredWidth = Integer.parseInt(configOur.get("window_preferredwidth"));
+		int windowPreferredHeight = Integer.parseInt(configOur.get("window_preferredheight"));
 
-		Insets localInsets = MainFrame.getInsets();
-		MainFrame.setSize(i3 + (localInsets.left - -localInsets.right), i5 + localInsets.top + (i2 + i4) - -localInsets.bottom);
-		MainFrame.setLocationRelativeTo(null);
-		MainFrame.setVisible(true);
-		var_1f50 = new ScrollPane();
-		MainFrame.add(var_1f50);
-		var_1f08 = new Panel();
-		var_1f08.setBackground(Color.black);
-		var_1f08.setLayout(null);
-		var_1f50.add(var_1f08);
+		Insets localInsets = window.getInsets();
+		window.setSize(windowPreferredWidth + localInsets.left + localInsets.right, windowPreferredHeight + advertHeight + localInsets.top + localInsets.bottom);
+		window.setLocationRelativeTo(null);
+		window.setVisible(true);
+		_scrollPane = new ScrollPane();
+		window.add(_scrollPane);
+		_panel = new Panel();
+		_panel.setBackground(Color.white);
+		_panel.setLayout(null);
+		_scrollPane.add(_panel);
 
-		int i6 = (!"yes".equals(Preferences.Get("Member"))) ? 1 : 0;
-		i6 = 1;
-		if (inWindows && (i6 != 0)) {
-			var_1f58 = new Canvas();
-			var_1f08.add(var_1f58);
-		}
-
-		var_1f08.add(_appletLoader);
+		_panel.add(_appletLoader);
 		var_1f10 = new Class_a(LanguageStrings.Get("tandc"));
-		var_1f08.add(var_1f10);
-		MainFrame.doLayout();
+		_panel.add(var_1f10);
+		window.doLayout();
 		sub_3809(-1);
-		var_1f50.doLayout();
-		if (inWindows) if (i6 != 0) {
-			while (true) {
-				if ((var_1f58.isDisplayable()) && (var_1f58.isShowing())) {
-					break; //break label1817;
-				}
-				try {
-					Thread.sleep(100L);
-				} catch (Exception localException4) {
-				}
-			}
-			try {
-				label1817:
-				System.load(browserControlFile.toString());
-				browsercontrol.create(var_1f58, configOur.get("adverturl"));
-				browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
-			} catch (Throwable localThrowable) {
-				if (debug) {
-					localThrowable.printStackTrace();
-				}
-				//DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
-				//return;
-			}
-		}
+		_scrollPane.doLayout();
 
-		MainFrame.addWindowListener(MainWindowAdapter.GetInstance());
-		var_1f50.addComponentListener(new appletviewer());
+		window.addWindowListener(MainWindowAdapter.GetInstance());
+		_scrollPane.addComponentListener(new appletviewer());
 		_appletLoader.setStub(new Class_g());
 		_appletLoader.init();
 		_appletLoader.start();
 	}
-
-  public static void removeadvert() {
-    if (var_1f58 == null)
-      return;
-    if (browsercontrol.iscreated()) {
-      browsercontrol.destroy();
-    }
-    var_1f08.remove(var_1f58);
-    var_1f58 = null;
-    sub_3809(2);
-  }
-
-  public static void readdadvert() {
-    if (!inWindows || (var_1f58 != null))
-      return;
-    var_1f58 = new Canvas();
-    var_1f08.add(var_1f58);
-    sub_3809(2);
-
-    while ((!var_1f58.isDisplayable()) || (!var_1f58.isShowing()))
-    {
-      try
-      {
-        Thread.sleep(100L);
-      }
-      catch (Exception localException) {
-      }
-    }
-    try {
-      browsercontrol.create(var_1f58, configOur.get("adverturl"));
-      browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
-    } catch (Throwable localThrowable) {
-      if (debug) {
-        localThrowable.printStackTrace();
-      }
-      DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
-      return;
-    }
-  }
 
 	static final void Terminate() {
 		if (browsercontrol.iscreated()) {
@@ -481,7 +395,7 @@ public final class appletviewer
 
   private static final void sub_3809(int paramInt)
   {
-    int i = (var_1f58 == null) ? 0 : Integer.parseInt(configOur.get("advert_height"));
+    int i = 0;
 
     int j = 40;
 
@@ -492,9 +406,9 @@ public final class appletviewer
     int i1 = Integer.parseInt(configOur.get("applet_maxwidth"));
     int i2 = Integer.parseInt(configOur.get("applet_maxheight"));
 
-    Dimension localDimension = var_1f50.getSize();
+    Dimension localDimension = _scrollPane.getSize();
 
-    Insets localInsets = var_1f50.getInsets();
+    Insets localInsets = _scrollPane.getInsets();
 
     int i3 = -localInsets.right + (localDimension.width + -localInsets.left);
 
@@ -528,16 +442,9 @@ public final class appletviewer
     {
       i8 = j + (l + i);
     }
-    var_1f08.setSize(i7, i8);
-    if (var_1f58 != null)
-    {
-      var_1f58.setBounds((i7 + -i5) / 2, 0, i5, i);
-    }
+    _panel.setSize(i7, i8);
     _appletLoader.setBounds((-i5 + i7) / 2, i, i5, i6);
     var_1f10.setBounds((i7 - i5) / paramInt, i + i6, i5, j);
-    if ((var_1f58 == null) || (!browsercontrol.iscreated()))
-      return;
-    browsercontrol.resize(var_1f58.getSize().width, var_1f58.getSize().height);
   }
 
 	private static final byte[] downloadBinary(String fileName, String baseUrl) {

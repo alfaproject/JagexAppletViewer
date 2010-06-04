@@ -26,7 +26,7 @@ final class DialogFactory {
 	}
 
 	private static final void makeDialog(String text, String buttonText, String title) {
-		_dialog = new Dialog(appletviewer.MainFrame, title, true);
+		_dialog = new Dialog(appletviewer.window, title, true);
 		_dialog.add(new Label(text, 1));
 
 		Panel panel = new Panel();
@@ -38,7 +38,7 @@ final class DialogFactory {
 		_dialog.add(panel, "South");
 		_dialog.setResizable(false);
 		_dialog.setSize(500, 100);
-		_dialog.setLocationRelativeTo(appletviewer.MainFrame);
+		_dialog.setLocationRelativeTo(appletviewer.window);
 	}
 
 } //class DialogFactory

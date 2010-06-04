@@ -33,13 +33,13 @@ final class DialogCopyPasteUrl
 		panelButtons.add(buttonOk);
 
 		// information dialog
-		_dialog = new Dialog(appletviewer.MainFrame, LanguageStrings.Get("information"), true);
+		_dialog = new Dialog(appletviewer.window, LanguageStrings.Get("information"), true);
 		_dialog.add(textArea);
 		_dialog.add(panelButtons, "South");
 		_dialog.addWindowListener(this);
 		_dialog.setResizable(false);
 		_dialog.setSize(400, 150);
-		_dialog.setLocationRelativeTo(appletviewer.MainFrame);
+		_dialog.setLocationRelativeTo(appletviewer.window);
 		_dialog.setVisible(true);
 	}
 
