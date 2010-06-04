@@ -386,17 +386,15 @@ public final class appletviewer
 		sub_3809(-1);
 		var_1f50.doLayout();
 		if (inWindows) if (i6 != 0) {
-			do {
-				while (true) {
-					if ((var_1f58.isDisplayable()) && (var_1f58.isShowing())) {
-						break; //break label1817;
-					}
-					try {
-						Thread.sleep(100L);
-					} catch (Exception localException4) {
-					}
+			while (true) {
+				if ((var_1f58.isDisplayable()) && (var_1f58.isShowing())) {
+					break; //break label1817;
 				}
-			} while (!bool);
+				try {
+					Thread.sleep(100L);
+				} catch (Exception localException4) {
+				}
+			}
 			try {
 				label1817:
 				System.load(browserControlFile.toString());
