@@ -63,16 +63,13 @@ final class Class_i
 		}
 	}
 
-	static final void sub_7d4(int paramInt) {
+	static final void sub_7d4() {
 		if (var_5a4 != null) {
 			return;
 		}
 		var_5a4 = new Class_i();
 
 		Thread localThread = new Thread(var_5a4);
-		if (paramInt != -12660) {
-			return;
-		}
 		localThread.setPriority(10);
 		localThread.setDaemon(true);
 		localThread.start();

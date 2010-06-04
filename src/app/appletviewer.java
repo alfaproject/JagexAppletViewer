@@ -334,7 +334,7 @@ public final class appletviewer
 		// load rs client
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app"));
 		if (inWindows) {
-			Class_e.sub_ae5();
+			//Class_e.sub_ae5();
 		}
 
 		try {
@@ -350,8 +350,10 @@ public final class appletviewer
 			}
 			DialogFactory.ShowError(LanguageStrings.Get("err_target_applet"));
 		}
+
+		// hide our loading dialog
 		LoaderBox.Hide();
-		Class_i.sub_7d4(-12660);
+		Class_i.sub_7d4();
 
 		MainFrame.setTitle(configOur.get("title"));
 		int i2 = (inWindows ? Integer.parseInt(configOur.get("advert_height")) : 0);
