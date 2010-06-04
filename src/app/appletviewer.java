@@ -2,7 +2,6 @@ package app;
 
 import java.applet.Applet;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Image;
@@ -30,7 +29,6 @@ public final class appletviewer
 	static Frame window;
 	private static ScrollPane _scrollPane;
 	private static Panel _panel;
-	private static Component var_1f10;
 	private static Applet _appletLoader;
 	static boolean inWindows;
 	private static float var_1f70;
@@ -48,7 +46,7 @@ public final class appletviewer
 	}
 
 	public final void componentResized(ComponentEvent paramComponentEvent) {
-		sub_3809(2);
+		resize();
 	}
 
 	private static final void loadConfigValues() {
@@ -244,12 +242,11 @@ public final class appletviewer
 
 		window.setTitle(configOur.get("title") + " - hacked by _aLfa_ (c) 2010");
 
-		int advertHeight = (inWindows ? Integer.parseInt(configOur.get("advert_height")) : 0);
 		int windowPreferredWidth = Integer.parseInt(configOur.get("window_preferredwidth"));
 		int windowPreferredHeight = Integer.parseInt(configOur.get("window_preferredheight"));
 
-		Insets localInsets = window.getInsets();
-		window.setSize(windowPreferredWidth + localInsets.left + localInsets.right, windowPreferredHeight + advertHeight + localInsets.top + localInsets.bottom);
+		Insets windowInsets = window.getInsets();
+		window.setSize(windowPreferredWidth + windowInsets.left + windowInsets.right, windowPreferredHeight + windowInsets.top + windowInsets.bottom);
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 		_scrollPane = new ScrollPane();
@@ -260,10 +257,8 @@ public final class appletviewer
 		_scrollPane.add(_panel);
 
 		_panel.add(_appletLoader);
-		var_1f10 = new Class_a(LanguageStrings.Get("tandc"));
-		_panel.add(var_1f10);
 		window.doLayout();
-		sub_3809(-1);
+		resize();
 		_scrollPane.doLayout();
 
 		window.addWindowListener(MainWindowAdapter.GetInstance());
@@ -277,59 +272,47 @@ public final class appletviewer
 		System.exit(0);
 	}
 
-  private static final void sub_3809(int paramInt)
-  {
-    int i = 0;
+	private static final void resize() {
+		int appletMinWidth = Integer.parseInt(configOur.get("applet_minwidth"));
+		int appletMinHeight = Integer.parseInt(configOur.get("applet_minheight"));
+		int appletMaxWidth = Integer.parseInt(configOur.get("applet_maxwidth"));
+		int appletMaxHeight = Integer.parseInt(configOur.get("applet_maxheight"));
 
-    int j = 40;
+		Dimension scrollPaneSize = _scrollPane.getSize();
+		Insets scrollPaneInsets = _scrollPane.getInsets();
 
-    int k = Integer.parseInt(configOur.get("applet_minwidth"));
+		int availableWidth = scrollPaneSize.width - scrollPaneInsets.right  - scrollPaneInsets.left;
+		int availableHeight = scrollPaneSize.height - scrollPaneInsets.bottom - scrollPaneInsets.top;
 
-    int l = Integer.parseInt(configOur.get("applet_minheight"));
+		int appletWidth = availableWidth;
+		if (appletWidth < appletMinWidth) {
+			appletWidth = appletMinWidth;
+		}
+		if (appletWidth > appletMaxWidth) {
+			appletWidth = appletMaxWidth;
+		}
 
-    int i1 = Integer.parseInt(configOur.get("applet_maxwidth"));
-    int i2 = Integer.parseInt(configOur.get("applet_maxheight"));
+		int appletHeight = availableHeight;
+		if (appletHeight < appletMinHeight) {
+			appletHeight = appletMinHeight;
+		}
+		if (appletHeight > appletMaxHeight) {
+			appletHeight = appletMaxHeight;
+		}
 
-    Dimension localDimension = _scrollPane.getSize();
+		int panelMinWidth = availableWidth;
+		if (panelMinWidth < appletMinWidth) {
+			panelMinWidth = appletMinWidth;
+		}
 
-    Insets localInsets = _scrollPane.getInsets();
+		int panelMinHeight = availableHeight;
+		if (panelMinHeight < appletMinHeight) {
+			panelMinHeight = appletMinHeight;
+		}
 
-    int i3 = -localInsets.right + (localDimension.width + -localInsets.left);
-
-    int i4 = -localInsets.bottom + -localInsets.top + localDimension.height;
-
-    int i5 = i3;
-    if (i5 < k)
-    {
-      i5 = k;
-    }
-    int i6 = -i + i4 - j;
-    if (i6 < l)
-    {
-      i6 = l;
-    }
-    if ((i5 ^ 0xFFFFFFFF) < (i1 ^ 0xFFFFFFFF))
-    {
-      i5 = i1;
-    }
-    if (i6 > i2) {
-      i6 = i2;
-    }
-
-    int i7 = i3;
-
-    int i8 = i4;
-    if ((k ^ 0xFFFFFFFF) < (i7 ^ 0xFFFFFFFF)) {
-      i7 = k;
-    }
-    if (i8 < j + l + i)
-    {
-      i8 = j + (l + i);
-    }
-    _panel.setSize(i7, i8);
-    _appletLoader.setBounds((-i5 + i7) / 2, i, i5, i6);
-    var_1f10.setBounds((i7 - i5) / paramInt, i + i6, i5, j);
-  }
+		_panel.setSize(panelMinWidth, panelMinHeight);
+		_appletLoader.setBounds(0, 0, appletWidth, appletHeight);
+	}
 
 	private static final byte[] downloadBinary(String fileName, String baseUrl) {
 		byte[] buffer = new byte[300000];
