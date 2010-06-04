@@ -45,7 +45,7 @@ final class JavaArchive {
 			md5.reset();
 			md5.update(fileData);
 			byte[] rawMd5Hash = md5.digest();
-			String md5Hash = Class_k.sub_23c(rawMd5Hash);
+			String md5Hash = Base64.encodeBytes(rawMd5Hash);
 			if (!md5Hash.equals(manifest.MD5Digest)) {
 				return null;
 			}
@@ -54,7 +54,7 @@ final class JavaArchive {
 			sha1.reset();
 			sha1.update(fileData);
 			byte[] rawSha1Hash = sha1.digest();
-			String sha1Hash = Class_k.sub_23c(rawSha1Hash);
+			String sha1Hash = Base64.encodeBytes(rawSha1Hash);
 			if (!sha1Hash.equals(manifest.SHA1Digest)) {
 				return null;
 			}
@@ -63,7 +63,7 @@ final class JavaArchive {
 			md5.reset();
 			md5.update(manifest.RawData);
 			rawMd5Hash = md5.digest();
-			md5Hash = Class_k.sub_23c(rawMd5Hash);
+			md5Hash = Base64.encodeBytes(rawMd5Hash);
 			if (!md5Hash.equals(zigbert.MD5Digest)) {
 				return null;
 			}
@@ -72,7 +72,7 @@ final class JavaArchive {
 			sha1.reset();
 			sha1.update(manifest.RawData);
 			rawSha1Hash = sha1.digest();
-			sha1Hash = Class_k.sub_23c(rawSha1Hash);
+			sha1Hash = Base64.encodeBytes(rawSha1Hash);
 			if (!sha1Hash.equals(zigbert.SHA1Digest)) {
 				return null;
 			}
@@ -92,7 +92,7 @@ final class JavaArchive {
 				X509Certificate certificate = certificates.get(i);
 				String certSerialNo = certificate.getSerialNumber().toString();
 				byte[] certPubKeyRaw = certificate.getPublicKey().getEncoded();
-				String certPubKey = Class_k.sub_23c(certPubKeyRaw);
+				String certPubKey = Base64.encodeBytes(certPubKeyRaw);
 
 				if (i == 0) {
 					if (!certSerialNo.equals("105014014184937810784491209018632141624")) {
