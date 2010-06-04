@@ -299,30 +299,30 @@ public final class appletviewer
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
 		File browserControlFile = null;
 		try {
-			byte[] browserControlBinary;
+			byte[] browserControlJar;
 			if (!_in64Bits) {
-				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
+				browserControlJar = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
 				browserControlFile = getLocationForFile("browsercontrol.dll", cacheSubdir, l, homePath);
 
-				byte[] localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol.dll");
-				if (localObject4 == null) {
+				byte[] browserControlBinary = new ZippedFile(browserControlJar).Extract("browsercontrol.dll");
+				if (browserControlBinary == null) {
 					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
 				}
-				saveFile(localObject4, browserControlFile);
+				saveFile(browserControlBinary, browserControlFile);
 			} else {
-				browserControlBinary = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
+				browserControlJar = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
 				browserControlFile = getLocationForFile("browsercontrol64.dll", cacheSubdir, l, homePath);
 
-				byte[] localObject4 = new Class_u(browserControlBinary).sub_ca1("browsercontrol64.dll");
-				if (localObject4 == null) {
+				byte[] browserControlBinary = new ZippedFile(browserControlJar).Extract("browsercontrol64.dll");
+				if (browserControlBinary == null) {
 					browserControlFile = null;
 					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
 				}
-				saveFile(localObject4, browserControlFile);
+				saveFile(browserControlBinary, browserControlFile);
 			}
 			if (debug) {
-				System.out.println("dlldata : " + browserControlBinary.length);
+				System.out.println("dlldata : " + browserControlJar.length);
 			}
 		} catch (Exception ex) {
 			if (debug) {

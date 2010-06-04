@@ -12,7 +12,7 @@ final class Class_s extends ClassLoader
 {
   private Hashtable var_558 = new Hashtable();
   private ProtectionDomain var_560;
-  private Class_u var_568;
+  private ZippedFile var_568;
 
   protected final synchronized Class loadClass(String paramString, boolean paramBoolean)
     throws ClassNotFoundException
@@ -23,7 +23,7 @@ final class Class_s extends ClassLoader
       return localClass;
     }
 
-    byte[] arrayOfByte = this.var_568.sub_ca1(paramString + ".class");
+    byte[] arrayOfByte = this.var_568.Extract(paramString + ".class");
     if (arrayOfByte != null)
     {
       localClass = defineClass(paramString, arrayOfByte, 0, arrayOfByte.length, this.var_560);
@@ -37,7 +37,7 @@ final class Class_s extends ClassLoader
     return super.findSystemClass(paramString);
   }
   Class_s(byte[] paramArrayOfByte) throws IOException {
-    this.var_568 = new Class_u(paramArrayOfByte);
+    this.var_568 = new ZippedFile(paramArrayOfByte);
 
     CodeSource localCodeSource = new CodeSource(null, (Certificate[])null);
     Permissions localPermissions = new Permissions();
