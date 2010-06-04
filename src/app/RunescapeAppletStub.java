@@ -13,7 +13,7 @@ import java.security.InvalidParameterException;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-final class Class_g
+final class RunescapeAppletStub
 		implements AppletStub, AppletContext
 {
 
@@ -21,22 +21,22 @@ final class Class_g
 		return this;
 	}
 
-	public final void showDocument(URL paramURL) {
+	public final void showDocument(URL url) {
 		if (appletviewer.debug) {
-			System.out.println("showdocument url:" + paramURL);
+			System.out.println("RunescapeAppletStub.showDocument(url = " + url + ")");
 		}
 	}
 
-	public final Applet getApplet(String paramString) {
+	public final Applet getApplet(String name) {
 		throw new UnsupportedOperationException();
 	}
 
-	public final String getParameter(String paramString) {
-		String str = appletviewer.configInner.get(paramString);
-		if (appletviewer.debug && (str == null)) {
-			System.out.println("Unavailable param:" + paramString);
+	public final String getParameter(String name) {
+		String value = appletviewer.configInner.get(name);
+		if (appletviewer.debug) {
+			System.out.println("RunescapeAppletStub.getParameter(name = " + name + ")\tresult = " + value);
 		}
-		return str;
+		return value;
 	}
 
 	public final URL getCodeBase() {
@@ -47,11 +47,11 @@ final class Class_g
 		}
 	}
 
-	public final void showStatus(String paramString) {
+	public final void showStatus(String status) {
 		throw new UnsupportedOperationException();
 	}
 
-	public final InputStream getStream(String paramString) {
+	public final InputStream getStream(String key) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -59,32 +59,32 @@ final class Class_g
 		throw new UnsupportedOperationException();
 	}
 
-	public final AudioClip getAudioClip(URL paramURL) {
+	public final AudioClip getAudioClip(URL url) {
 		throw new UnsupportedOperationException();
 	}
 
-	public final void setStream(String paramString, InputStream paramInputStream) throws IOException {
+	public final void setStream(String key, InputStream stream) throws IOException {
 		throw new UnsupportedOperationException();
 	}
 
-	public final Image getImage(URL paramURL) {
+	public final Image getImage(URL url) {
 		throw new UnsupportedOperationException();
 	}
 
-	public final void appletResize(int paramInt1, int paramInt2) {
+	public final void appletResize(int width, int weight) {
 	}
 
 	public final URL getDocumentBase() {
 		try {
 			return new URL(appletviewer.configOur.get("codebase"));
-		} catch (MalformedURLException localMalformedURLException) {
+		} catch (MalformedURLException ex) {
 			throw new InvalidParameterException();
 		}
 	}
 
-	public final void showDocument(URL paramURL, String paramString) {
+	public final void showDocument(URL url, String target) {
 		if (appletviewer.debug) {
-			System.out.println("showdocument url:" + paramURL + " target:" + paramString);
+			System.out.println("RunescapeAppletStub.showDocument(url = " + url + ", target = " + target + ")");
 		}
 	}
 
@@ -96,4 +96,4 @@ final class Class_g
 		throw new UnsupportedOperationException();
 	}
 
-} //class Class_g
+} //class RunescapeAppletStub

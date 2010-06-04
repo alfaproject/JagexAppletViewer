@@ -262,7 +262,7 @@ public final class appletviewer
 
 		window.addWindowListener(MainWindowAdapter.GetInstance());
 		_panel.addComponentListener(new appletviewer());
-		_appletLoader.setStub(new Class_g());
+		_appletLoader.setStub(new RunescapeAppletStub());
 		_appletLoader.init();
 		_appletLoader.start();
 	}
