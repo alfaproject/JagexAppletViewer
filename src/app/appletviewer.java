@@ -331,17 +331,18 @@ public final class appletviewer
 			DialogFactory.ShowError(LanguageStrings.Get("err_load_bc"));
 		}
 
+		// load rs client
 		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app"));
 		if (inWindows) {
 			Class_e.sub_ae5();
 		}
 
 		try {
-			byte[] arrayOfByte2 = downloadBinary(configOur.get("loader_jar"), codeBase);
-			Class_s localObject4 = new Class_s(arrayOfByte2);
-			var_1f20 = (Applet)(localObject4).loadClass("loader").newInstance();
+			byte[] loaderBinary = downloadBinary(configOur.get("loader_jar"), codeBase);
+			ClassLoaderZipFile localObject4 = new ClassLoaderZipFile(loaderBinary);
+			var_1f20 = (Applet)localObject4.loadClass("loader").newInstance();
 			if (debug) {
-				System.out.println("loader_jar : " + arrayOfByte2.length);
+				System.out.println("loader_jar : " + loaderBinary.length);
 			}
 		} catch (Exception localException3) {
 			if (debug) {
