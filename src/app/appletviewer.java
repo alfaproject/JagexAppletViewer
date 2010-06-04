@@ -14,15 +14,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.net.URL;
 import java.util.Hashtable;
-import nativeadvert.browsercontrol;
 
 public final class appletviewer
 		implements ComponentListener
@@ -36,7 +33,6 @@ public final class appletviewer
 	private static Component var_1f10;
 	private static Applet _appletLoader;
 	static boolean inWindows;
-	private static boolean _in64Bits;
 	private static float var_1f70;
 	private static float var_1f78 = 0.0F;
 	public static int var_1fa0;
@@ -145,59 +141,6 @@ public final class appletviewer
 	public final void componentShown(ComponentEvent paramComponentEvent) {
 	}
 
-	private static final File getLocationForFile(String fileName, String cacheSubdir, int mode, String homeDir) {
-		String[] dirs = { "c:/rscache/", "/rscache/", "c:/windows/", "c:/winnt/", "c:/", homeDir, "/tmp/", "" };
-		String[] subDirs = { ".jagex_cache_" + mode, ".file_store_" + mode };
-
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < subDirs.length; j++) {
-				for (int k = 0; k < dirs.length; k++) {
-					String filePath = dirs[k] + subDirs[j] + "/" + (cacheSubdir == null ? "" : cacheSubdir + "/") + fileName;
-					RandomAccessFile dummyFile = null;
-					try {
-						File file = new File(filePath);
-						if ((i == 1) || file.exists()) {
-							String dir = dirs[k];
-							if ((i == 0) || (dir.length() == 0) || (new File(dir).exists())) {
-								new File(dirs[k] + subDirs[j]).mkdir();
-								if (cacheSubdir != null) {
-									new File(dirs[k] + subDirs[j] + "/" + cacheSubdir).mkdir();
-								}
-
-								// check if this file is read/write-able
-								dummyFile = new RandomAccessFile(file, "rw");
-								int l = dummyFile.read();
-								dummyFile.seek(0L);
-								dummyFile.write(l);
-								dummyFile.seek(0L);
-								dummyFile.close();
-
-								// looks like it is, return the path
-								return file;
-							}
-						}
-					} catch (Exception ex) {
-						if (debug) {
-							System.out.println("Unable to open/write: " + filePath);
-						}
-						try {
-							if (dummyFile != null) {
-								dummyFile.close();
-								dummyFile = null;
-							}
-						} catch (IOException ioEx) {
-						}
-					}
-				}
-			}
-		}
-
-		if (!debug) {
-			throw new RuntimeException();
-		}
-		throw new RuntimeException("Fatal - could not find ANY location for file: " + fileName);
-	}
-
 	public static final void Load(String resourcesName) {
 		debug = Boolean.getBoolean("com.jagex.debug");
 		if (debug) {
@@ -257,15 +200,10 @@ public final class appletviewer
 			}
 		}
 
-		int l = Integer.parseInt(configInner.get("modewhat")) + 32;
-
-		String cacheSubdir = configOur.get("cachesubdir");
 		String codeBase = configOur.get("codebase");
 
 		String osName = System.getProperty("os.name").toLowerCase();
-		String osArch = System.getProperty("os.arch").toLowerCase();
 		inWindows = osName.startsWith("win");
-		_in64Bits = (osArch.startsWith("amd64") || osArch.startsWith("x86_64"));
 
 		String homePath = null;
 		try {
@@ -277,42 +215,6 @@ public final class appletviewer
 		}
 		if (homePath == null) {
 			homePath = "~/";
-		}
-
-		// load browser control
-		LoaderBox.SetProgressText(LanguageStrings.Get("loading_app_resources"));
-		File browserControlFile = null;
-		try {
-			byte[] browserControlJar;
-			if (!_in64Bits) {
-				browserControlJar = downloadBinary(configOur.get("browsercontrol_win_x86_jar"), codeBase);
-				browserControlFile = getLocationForFile("browsercontrol.dll", cacheSubdir, l, homePath);
-
-				byte[] browserControlBinary = new ZippedFile(browserControlJar).Extract("browsercontrol.dll");
-				if (browserControlBinary == null) {
-					browserControlFile = null;
-					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc"));
-				}
-				saveFile(browserControlBinary, browserControlFile);
-			} else {
-				browserControlJar = downloadBinary(configOur.get("browsercontrol_win_amd64_jar"), codeBase);
-				browserControlFile = getLocationForFile("browsercontrol64.dll", cacheSubdir, l, homePath);
-
-				byte[] browserControlBinary = new ZippedFile(browserControlJar).Extract("browsercontrol64.dll");
-				if (browserControlBinary == null) {
-					browserControlFile = null;
-					DialogFactory.ShowError(LanguageStrings.Get("err_verify_bc64"));
-				}
-				saveFile(browserControlBinary, browserControlFile);
-			}
-			if (debug) {
-				System.out.println("dlldata : " + browserControlJar.length);
-			}
-		} catch (Exception ex) {
-			if (debug) {
-				ex.printStackTrace();
-			}
-			DialogFactory.ShowError(LanguageStrings.Get("err_load_bc"));
 		}
 
 		// load rs client
@@ -372,25 +274,7 @@ public final class appletviewer
 	}
 
 	static final void Terminate() {
-		if (browsercontrol.iscreated()) {
-			browsercontrol.destroy();
-		}
 		System.exit(0);
-	}
-
-	private static final boolean saveFile(byte[] binaryData, File filePath) {
-		try {
-			FileOutputStream writer = new FileOutputStream(filePath);
-			writer.write(binaryData, 0, binaryData.length);
-			writer.close();
-			return true;
-		} catch (IOException localIOException) {
-			if (debug) {
-				localIOException.printStackTrace();
-			}
-			DialogFactory.ShowError(LanguageStrings.Get("err_save_file"));
-		}
-		return false;
 	}
 
   private static final void sub_3809(int paramInt)
