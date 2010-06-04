@@ -156,7 +156,9 @@ public final class appletviewer
 		// load window icon
 		File resourcesPath = new File(new File(System.getProperty("user.dir")).getParentFile(), resourcesName);
 		File iconPath = new File(resourcesPath, "jagexappletviewer.png");
-		System.out.println("Trying to load icon file: " + iconPath.getAbsolutePath());
+		if (debug) {
+			System.out.println("Trying to load icon file: " + iconPath.getAbsolutePath());
+		}
 		if (iconPath.exists()) {
 			Image icon = Toolkit.getDefaultToolkit().getImage(iconPath.getAbsolutePath());
 			if (icon != null) {
@@ -178,10 +180,14 @@ public final class appletviewer
 				DialogFactory.ShowError(LanguageStrings.Get("err_missing_config"));
 			}
 			_configFile = new File(resourcesPath, configFile);
-			System.out.println("Config File is " + _configFile.getAbsolutePath());
+			if (debug) {
+				System.out.println("Config File is " + _configFile.getAbsolutePath());
+			}
 		} else {
 			_configUrl = configUrl;
-			System.out.println("Config URL is " + _configUrl);
+			if (debug) {
+				System.out.println("Config URL is " + _configUrl);
+			}
 		}
 
 		loadConfigValues();
