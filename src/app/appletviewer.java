@@ -31,7 +31,7 @@ public final class appletviewer
 	private static Panel var_1f08;
 	private static Component var_1f10;
 	static boolean debug = false;
-	private static Applet var_1f20;
+	private static Applet _appletLoader;
 	static boolean inWindows;
 	private static boolean _in64Bits;
 	static Frame MainFrame;
@@ -339,8 +339,8 @@ public final class appletviewer
 
 		try {
 			byte[] loaderBinary = downloadBinary(configOur.get("loader_jar"), codeBase);
-			ClassLoaderZipFile localObject4 = new ClassLoaderZipFile(loaderBinary);
-			var_1f20 = (Applet)localObject4.loadClass("loader").newInstance();
+			ClassLoaderZipFile loaderPackage = new ClassLoaderZipFile(loaderBinary);
+			_appletLoader = (Applet)loaderPackage.loadClass("loader").newInstance();
 			if (debug) {
 				System.out.println("loader_jar : " + loaderBinary.length);
 			}
@@ -379,7 +379,7 @@ public final class appletviewer
 			var_1f08.add(var_1f58);
 		}
 
-		var_1f08.add(var_1f20);
+		var_1f08.add(_appletLoader);
 		var_1f10 = new Class_a(LanguageStrings.Get("tandc"));
 		var_1f08.add(var_1f10);
 		MainFrame.doLayout();
@@ -413,9 +413,9 @@ public final class appletviewer
 
 		MainFrame.addWindowListener(MainWindowAdapter.GetInstance());
 		var_1f50.addComponentListener(new appletviewer());
-		var_1f20.setStub(new Class_g());
-		var_1f20.init();
-		var_1f20.start();
+		_appletLoader.setStub(new Class_g());
+		_appletLoader.init();
+		_appletLoader.start();
 	}
 
   public static void removeadvert() {
@@ -533,7 +533,7 @@ public final class appletviewer
     {
       var_1f58.setBounds((i7 + -i5) / 2, 0, i5, i);
     }
-    var_1f20.setBounds((-i5 + i7) / 2, i, i5, i6);
+    _appletLoader.setBounds((-i5 + i7) / 2, i, i5, i6);
     var_1f10.setBounds((i7 - i5) / paramInt, i + i6, i5, j);
     if ((var_1f58 == null) || (!browsercontrol.iscreated()))
       return;
