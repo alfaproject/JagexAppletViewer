@@ -15,34 +15,55 @@ final class ClassLoaderZipFile
 	private ProtectionDomain _protectionDomain;
 	private ZippedFile _zippedFile;
 
-	@Override protected final synchronized Class loadClass(String name, boolean resolve)
-		throws ClassNotFoundException
-	{
-		Class localClass = _classes.get(name);
-		if (localClass != null) {
-			return localClass;
-		}
-
-		byte[] classData = _zippedFile.Extract(name + ".class");
-		if (classData != null) {
-			localClass = defineClass(name, classData, 0, classData.length, _protectionDomain);
-			if (resolve) {
-				resolveClass(localClass);
-			}
-			_classes.put(name, localClass);
-			return localClass;
-		}
-
-		return super.findSystemClass(name);
-	}
-
 	ClassLoaderZipFile(byte[] zippedBinary) throws IOException {
+		super(ClassLoaderZipFile.class.getClassLoader());
+
 		_zippedFile = new ZippedFile(zippedBinary);
 
 		CodeSource codeSource = new CodeSource(null, (Certificate[])null);
 		Permissions permissions = new Permissions();
 		permissions.add(new AllPermission());
 		_protectionDomain = new ProtectionDomain(codeSource, permissions);
+	}
+
+	@Override protected final synchronized Class loadClass(String name, boolean resolve)
+		throws ClassNotFoundException
+	{
+		// did we already load this class?
+		Class cl = _classes.get(name);
+		if (cl != null) {
+			return cl;
+		}
+
+		// check if it is a system class
+		try {
+			return findSystemClass(name);
+		} catch (Exception ex) {
+			// ignore these
+		}
+
+		// all else failed, let's try to load it from zip file
+		try {
+			// load class data from zipped binary and save in byte array
+			byte[] classData = _zippedFile.Extract(name + ".class");
+
+			// convert byte array to class
+			cl = defineClass(name, classData, 0, classData.length, _protectionDomain);
+
+			// resolve the class definition if appropriate
+			if (resolve) {
+				resolveClass(cl);
+			}
+
+			// cache this class
+			_classes.put(name, cl);
+
+			// return class just created
+			return cl;
+		} catch (Exception ex) {
+		}
+
+		return null;
 	}
 
 } //class ClassLoaderZipFile

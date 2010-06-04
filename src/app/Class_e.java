@@ -28,7 +28,6 @@ final class Class_e
 			protectionDomain = new ProtectionDomain(codeSource, permissions);
 		}
 
-		/*
 		try {
 			URL url = super.getClass().getClassLoader().getResource("netscape/javascript/JSObjec_.class");
 			URLConnection urlConnection = url.openConnection();
@@ -62,7 +61,6 @@ final class Class_e
 			} catch (Exception innerEx) {
 			}
 		}
-		*/
 
 		return _classLoader.loadClass(name);
 	}
