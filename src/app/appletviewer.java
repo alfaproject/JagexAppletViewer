@@ -404,8 +404,8 @@ public final class appletviewer
 				if (debug) {
 					localThrowable.printStackTrace();
 				}
-				DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
-				return;
+				//DialogFactory.ShowError(LanguageStrings.Get("err_create_advertising"));
+				//return;
 			}
 		}
 
