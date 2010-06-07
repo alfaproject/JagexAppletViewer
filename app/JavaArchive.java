@@ -12,7 +12,8 @@ import java.util.zip.ZipInputStream;
 import sun.security.pkcs.PKCS7;
 import sun.security.pkcs.SignerInfo;
 
-final class JavaArchive {
+final class JavaArchive
+{
 
 	private Hashtable<String, byte[]> _files = new Hashtable<String, byte[]>();
 	private Hashtable<String, Manifest> _manifests = new Hashtable<String, Manifest>();
@@ -20,7 +21,8 @@ final class JavaArchive {
 	private PKCS7 _publicKey;
 	private byte[] _zigbertData;
 
-	final byte[] ExtractAndValidate(String fileName) {
+	final byte[] ExtractAndValidate(String fileName)
+	{
 		try {
 			byte[] fileData = _files.remove(fileName);
 			if (fileData == null) {
@@ -45,7 +47,7 @@ final class JavaArchive {
 			md5.reset();
 			md5.update(fileData);
 			byte[] rawMd5Hash = md5.digest();
-			String md5Hash = Base64.encodeBytes(rawMd5Hash);
+			String md5Hash = Base64.encode(rawMd5Hash);
 			if (!md5Hash.equals(manifest.MD5Digest)) {
 				return null;
 			}
@@ -54,7 +56,7 @@ final class JavaArchive {
 			sha1.reset();
 			sha1.update(fileData);
 			byte[] rawSha1Hash = sha1.digest();
-			String sha1Hash = Base64.encodeBytes(rawSha1Hash);
+			String sha1Hash = Base64.encode(rawSha1Hash);
 			if (!sha1Hash.equals(manifest.SHA1Digest)) {
 				return null;
 			}
@@ -63,7 +65,7 @@ final class JavaArchive {
 			md5.reset();
 			md5.update(manifest.RawData);
 			rawMd5Hash = md5.digest();
-			md5Hash = Base64.encodeBytes(rawMd5Hash);
+			md5Hash = Base64.encode(rawMd5Hash);
 			if (!md5Hash.equals(zigbert.MD5Digest)) {
 				return null;
 			}
@@ -72,7 +74,7 @@ final class JavaArchive {
 			sha1.reset();
 			sha1.update(manifest.RawData);
 			rawSha1Hash = sha1.digest();
-			sha1Hash = Base64.encodeBytes(rawSha1Hash);
+			sha1Hash = Base64.encode(rawSha1Hash);
 			if (!sha1Hash.equals(zigbert.SHA1Digest)) {
 				return null;
 			}
@@ -83,16 +85,16 @@ final class JavaArchive {
 				return null;
 			}
 
-			ArrayList<X509Certificate> certificates = signers[0].getCertificateChain(_publicKey);
+			ArrayList<?> certificates = signers[0].getCertificateChain(_publicKey);
 			if (certificates.size() != 2) {
 				return null;
 			}
 
 			for (int i = 0; i < certificates.size(); i++) {
-				X509Certificate certificate = certificates.get(i);
+				X509Certificate certificate = (X509Certificate) certificates.get(i);
 				String certSerialNo = certificate.getSerialNumber().toString();
 				byte[] certPubKeyRaw = certificate.getPublicKey().getEncoded();
-				String certPubKey = Base64.encodeBytes(certPubKeyRaw);
+				String certPubKey = Base64.encode(certPubKeyRaw);
 
 				if (i == 0) {
 					if (!certSerialNo.equals("105014014184937810784491209018632141624")) {
@@ -115,12 +117,14 @@ final class JavaArchive {
 			return fileData;
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			DialogFactory.ShowError(LanguageStrings.Get("err_get_file") + ":" + fileName + " [" + ex.toString() + "]");
+			DialogMessage.sub_648(97, Language.getText("err_get_file") + ":" + fileName + " [" + ex.toString() + "]");
 		}
 		return null;
 	}
 
-	JavaArchive(byte[] zippedData) throws IOException {
+	JavaArchive(byte[] zippedData)
+			throws IOException
+	{
 		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zippedData));
 
 		ZipEntry zipEntry;
@@ -154,7 +158,7 @@ final class JavaArchive {
 
 					// get manifest data
 					int firstByte = nameIndexes[k];
-					int lastByte = (k == nameIndexesCount -1 ? fileData.length : nameIndexes[k + 1] - 1);
+					int lastByte = (k == nameIndexesCount - 1 ? fileData.length : nameIndexes[k + 1] - 1);
 					manifest.RawData = new byte[lastByte - firstByte];
 					System.arraycopy(fileData, firstByte, manifest.RawData, 0, lastByte - firstByte);
 
@@ -197,4 +201,9 @@ final class JavaArchive {
 		}
 	}
 
-} //class ZippedFile
+}
+
+/*
+ * Location: \\.psf\Home\Documents\java\jagexappletviewer\ Qualified Name:
+ * app.Class_u JD-Core Version: 0.5.4
+ */
