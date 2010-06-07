@@ -1,35 +1,11 @@
 package app;
 
 import java.applet.Applet;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.ScrollPane;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Locale;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import nativeadvert.browsercontrol;
 
@@ -698,9 +674,32 @@ public class appletviewer
 		// currently in use by the language menu
 		new DialogLanguage(appletviewer.Window, appletviewer.languages);
 	}
-}
 
-/*
- * Location: \\.psf\Home\Documents\java\jagexappletviewer\ Qualified Name:
- * app.appletviewer JD-Core Version: 0.5.4
- */
+	public static void showUrl(String url, String target)
+	{
+		// quit url
+		if (target != null && target.equals("_top") && (url.endsWith("MAGICQUIT") || url.indexOf("/quit.ws") != -1 || (url.indexOf(".ws") == -1 && url.endsWith("/")))) {
+			// exit application
+			appletviewer.terminate();
+		} else if (url.startsWith("http://") || url.startsWith("https://")) {
+			// we only open http or https urls
+			try {
+				// open url in user's default browser
+				Desktop.getDesktop().browse(new URI(url));
+			} catch (URISyntaxException ex) {
+				// ignore invalid url
+				if (appletviewer.Debug) {
+					ex.printStackTrace();
+				}
+			} catch (Exception ex) {
+				// default browser could not be opened for some reason
+				if (appletviewer.Debug) {
+					ex.printStackTrace();
+				}
+
+				// show a window for user to copy/paste the url
+				new DialogUrl(url);
+			}
+		}
+	}
+}
