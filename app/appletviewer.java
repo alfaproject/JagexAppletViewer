@@ -451,9 +451,6 @@ public class appletviewer
 		// hide loading dialog
 		ProgressComponent.hideDialog();
 
-		// start url monitoring thread
-		UrlMonitor.start();
-
 		// set up client settings
 		Window.setTitle(ConfigClient.get("title") + " - hacked by _aLfa_ (c) 2010");
 

@@ -36,7 +36,7 @@ final class CopyrightBar
 		Point point = e.getPoint();
 		for (CopyrightLink link : _links) {
 			if (link.hotspot.contains(point)) {
-				UrlMonitor.showUrl(link.href, null);
+				UrlViewer.showUrl(link.href, null);
 				return;
 			}
 		}
