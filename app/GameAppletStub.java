@@ -11,11 +11,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Iterator;
 
 final class GameAppletStub
 		implements AppletStub, AppletContext
 {
+	private Map<String, String> _configClient;
+	private Map<String, String> _configApplet;
+
+	public GameAppletStub(Map<String, String> configClient, Map<String, String> configApplet) {
+		_configClient = configClient;
+		_configApplet = configApplet;
+	}
+
 	@Override
 	public final void showDocument(URL url)
 	{
@@ -37,7 +46,7 @@ final class GameAppletStub
 	@Override
 	public final String getParameter(String name)
 	{
-		String value = appletviewer.configApplet.get(name);
+		String value = _configApplet.get(name);
 		if (appletviewer.debug) {
 			System.out.println("GameAppletStub.getParameter(name = " + name + "):\tresult = " + value);
 		}
@@ -48,7 +57,7 @@ final class GameAppletStub
 	public final URL getCodeBase()
 	{
 		try {
-			return new URL(appletviewer.configClient.get("codebase"));
+			return new URL(_configClient.get("codebase"));
 		} catch (MalformedURLException ex) {
 			throw new InvalidParameterException();
 		}
@@ -58,7 +67,7 @@ final class GameAppletStub
 	public final URL getDocumentBase()
 	{
 		try {
-			return new URL(appletviewer.configClient.get("codebase"));
+			return new URL(_configClient.get("codebase"));
 		} catch (MalformedURLException ex) {
 			throw new InvalidParameterException();
 		}
