@@ -14,8 +14,8 @@ import java.security.cert.Certificate;
 final class MasterClassLoader
 		extends ClassLoader
 {
+	private static final MasterClassLoader INSTANCE = new MasterClassLoader();
 	private static ClassLoader _systemClassLoader;
-	private static MasterClassLoader _instance;
 
 	@Override
 	public final Class<?> loadClass(String name)
@@ -80,22 +80,18 @@ final class MasterClassLoader
 
 	public static void init()
 	{
-		if (_instance == null) {
-			_instance = new MasterClassLoader();
+		try {
+			// save system class loader
+			_systemClassLoader = ClassLoader.getSystemClassLoader();
 
-			try {
-				// save system class loader
-				_systemClassLoader = ClassLoader.getSystemClassLoader();
-
-				// hijack system class loader
-				Field scl = ClassLoader.class.getDeclaredField("scl");
-				scl.setAccessible(true);
-				scl.set(null, _instance);
-				scl.setAccessible(false);
-			} catch (Exception ex) {
-                if (appletviewer.Debug) {
-                    ex.printStackTrace();
-                }
+			// hijack system class loader
+			Field scl = ClassLoader.class.getDeclaredField("scl");
+			scl.setAccessible(true);
+			scl.set(null, INSTANCE);
+			scl.setAccessible(false);
+		} catch (Exception ex) {
+			if (appletviewer.Debug) {
+				ex.printStackTrace();
 			}
 		}
 	}
