@@ -4,7 +4,7 @@ public class jagexappletviewer
 {
 	public static void main(String[] args)
 	{
-		appletviewer gameViewer = new appletviewer();
+		appletviewer gameViewer = appletviewer.getInstance();
 		if (args.length < 1) {
 			gameViewer.load("runescape", "http://www.runescape.com/k=3/l=$(Language:0)/jav_config.ws", null, true);
 		} else {

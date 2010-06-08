@@ -10,8 +10,11 @@ import java.util.*;
 import nativeadvert.browsercontrol;
 
 public class appletviewer
+		extends Frame
 		implements ComponentListener, WindowListener, ActionListener
 {
+	public static final appletviewer INSTANCE = new appletviewer();
+
 	public static boolean debug = false;
 
 	public static boolean inWindows;
@@ -21,19 +24,26 @@ public class appletviewer
 	private static String _configUrl;
 	public static final Hashtable<String, String> configClient = new Hashtable<String, String>();
 	public static final Hashtable<String, String> configApplet = new Hashtable<String, String>();
-
-	public static Frame frame;
-	private static Applet _gameApplet;
-
-	private static Panel _panel;
-	private static Component _footerPanel;
-	private static MenuBar _menuBar;
-	private static ScrollPane _scrollPane;
-	private static Canvas _browserCanvas;
-
 	public static final HashMap<Integer, String> languages = new HashMap<Integer, String>();
 
+	// interface elements
+	private Panel _panel;
+	private Component _footerPanel;
+	private MenuBar _menuBar;
+	private ScrollPane _scrollPane;
+	private Canvas _browserCanvas;
+	private static Applet _gameApplet;
+
 	public static DialogProgress progressDialog;
+
+	private appletviewer()
+	{
+	}
+
+	public static appletviewer getInstance()
+	{
+		return INSTANCE;
+	}
 
 	public final void componentMoved(ComponentEvent paramComponentEvent)
 	{
@@ -107,12 +117,12 @@ public class appletviewer
 			if (debug) {
 				ex.printStackTrace();
 			}
-			DialogMessage.showError(frame, Language.getText("err_load_config"));
+			DialogMessage.showError(INSTANCE, Language.getText("err_load_config"));
 		} catch (Exception ex) {
 			if (debug) {
 				ex.printStackTrace();
 			}
-			DialogMessage.showError(frame, Language.getText("err_decode_config"));
+			DialogMessage.showError(INSTANCE, Language.getText("err_decode_config"));
 		} finally {
 			try {
 				reader.close();
@@ -129,7 +139,7 @@ public class appletviewer
 			menuLanguage.addActionListener(this);
 			menuOptions.add(menuLanguage);
 			_menuBar.add(menuOptions);
-			frame.setMenuBar(_menuBar);
+			INSTANCE.setMenuBar(_menuBar);
 		}
 	}
 
@@ -256,9 +266,6 @@ public class appletviewer
 			System.out.println("========================================");
 		}
 
-		// load main window
-		frame = new Frame();
-
 		// detect game and current working path
 		String currentPath = System.getProperty("user.home");
 		if (currentPath == null) {
@@ -277,19 +284,19 @@ public class appletviewer
 		if (iconFile.exists()) {
 			Image icon = Toolkit.getDefaultToolkit().getImage(iconFile.getAbsolutePath());
 			if (icon != null) {
-				frame.setIconImage(icon);
+				INSTANCE.setIconImage(icon);
 			}
 		}
 
 		// open loading dialog
-		progressDialog = new DialogProgress(this.frame, "Jagex Ltd.");
+		progressDialog = new DialogProgress(this.INSTANCE, "Jagex Ltd.");
 		progressDialog.setText(Language.getText("loaderbox_initial"));
 
 		// load configuration (1st step)
 		progressDialog.setText(Language.getText("loading_config"));
 		if (configUrl == null) {
 			if (configFile == null) {
-				DialogMessage.showError(frame, Language.getText("err_missing_config"));
+				DialogMessage.showError(INSTANCE, Language.getText("err_missing_config"));
 			} else {
 				_configFile = new File(gamePath, configFile);
 				if (appletviewer.debug) {
@@ -327,7 +334,7 @@ public class appletviewer
 					System.out.println("Config URL domain: " + domain);
 				}
 				if (!(domain.endsWith(".runescape.com") || domain.endsWith(".funorb.com"))) {
-					DialogMessage.showError(frame, Language.getText("err_invalid_config"));
+					DialogMessage.showError(INSTANCE, Language.getText("err_invalid_config"));
 				}
 			}
 		}
@@ -344,7 +351,7 @@ public class appletviewer
 			try {
 				int version = Integer.parseInt(confVersion);
 				if (version > 100) {
-					DialogMessage.showMessage(frame, Language.getText("new_version"));
+					DialogMessage.showMessage(INSTANCE, Language.getText("new_version"));
 				}
 			} catch (NumberFormatException localNumberFormatException) {
 			}
@@ -367,7 +374,7 @@ public class appletviewer
 					browserControlJar = downloadFile(configClient.get("browsercontrol_win_amd64_jar"), codeBase);
 					browserControlDll = new JavaArchive(browserControlJar).ExtractAndValidate("browsercontrol64.dll");
 					if (browserControlDll == null) {
-						DialogMessage.showError(frame, Language.getText("err_verify_bc64"));
+						DialogMessage.showError(INSTANCE, Language.getText("err_verify_bc64"));
 					}
 
 					browserControlPath = getPath("browsercontrol64.dll", cacheSubdir, mode, currentPath);
@@ -376,7 +383,7 @@ public class appletviewer
 					browserControlJar = downloadFile(configClient.get("browsercontrol_win_x86_jar"), codeBase);
 					browserControlDll = new JavaArchive(browserControlJar).ExtractAndValidate("browsercontrol.dll");
 					if (browserControlDll == null) {
-						DialogMessage.showError(frame, Language.getText("err_verify_bc"));
+						DialogMessage.showError(INSTANCE, Language.getText("err_verify_bc"));
 					}
 
 					browserControlPath = getPath("browsercontrol.dll", cacheSubdir, mode, currentPath);
@@ -391,7 +398,7 @@ public class appletviewer
 				if (appletviewer.debug) {
 					ex.printStackTrace();
 				}
-				DialogMessage.showError(frame, Language.getText("err_load_bc"));
+				DialogMessage.showError(INSTANCE, Language.getText("err_load_bc"));
 			}
 		}
 		progressDialog.setValue(2, 3); // 2nd step out of 3 finished
@@ -418,26 +425,26 @@ public class appletviewer
 			if (appletviewer.debug) {
 				ex.printStackTrace();
 			}
-			DialogMessage.showError(frame, Language.getText("err_target_applet"));
+			DialogMessage.showError(INSTANCE, Language.getText("err_target_applet"));
 		}
 
 		// hide loading dialog
 		progressDialog.dispose();
 
 		// set up client settings
-		frame.setTitle(configClient.get("title") + " - hacked by _aLfa_ (c) 2010");
+		INSTANCE.setTitle(configClient.get("title") + " - hacked by _aLfa_ (c) 2010");
 
 		int advertHeight = (inWindows ? Integer.parseInt(configClient.get("advert_height")) : 0);
 		int preferredWidth = Integer.parseInt(configClient.get("window_preferredwidth"));
 		int preferredHeight = Integer.parseInt(configClient.get("window_preferredheight"));
 		int footerPadding = 40;
 
-		Insets insets = frame.getInsets();
-		frame.setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + footerPadding + insets.top + insets.bottom);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+		Insets insets = INSTANCE.getInsets();
+		INSTANCE.setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + footerPadding + insets.top + insets.bottom);
+		INSTANCE.setLocationRelativeTo(null);
+		INSTANCE.setVisible(true);
 		_scrollPane = new ScrollPane();
-		frame.add(_scrollPane);
+		INSTANCE.add(_scrollPane);
 		_panel = new Panel();
 		_panel.setBackground(Color.red);
 		_panel.setLayout(null);
@@ -453,7 +460,7 @@ public class appletviewer
 		_panel.add(_gameApplet);
 		_footerPanel = new CopyrightBar(Language.getText("tandc"));
 		_panel.add(_footerPanel);
-		frame.doLayout();
+		INSTANCE.doLayout();
 		resize();
 		_scrollPane.doLayout();
 
@@ -476,18 +483,18 @@ public class appletviewer
 				if (appletviewer.debug) {
 					ex.printStackTrace();
 				}
-				DialogMessage.showError(frame, Language.getText("err_create_advertising"));
+				DialogMessage.showError(INSTANCE, Language.getText("err_create_advertising"));
 			}
 		}
 
-		frame.addWindowListener(this);
+		INSTANCE.addWindowListener(this);
 		_scrollPane.addComponentListener(new appletviewer());
 		_gameApplet.setStub(new GameAppletStub());
 		_gameApplet.init();
 		_gameApplet.start();
 	}
 
-	public static void removeAdvert()
+	public void removeAdvert()
 	{
 		if (_browserCanvas == null) {
 			return;
@@ -535,7 +542,7 @@ public class appletviewer
 		return text;
 	}
 
-	public static void reAddAdvert()
+	public void reAddAdvert()
 	{
 		if (!inWindows || _browserCanvas != null) {
 			return;
@@ -561,7 +568,7 @@ public class appletviewer
 			if (debug) {
 				ex.printStackTrace();
 			}
-			DialogMessage.showError(frame, Language.getText("err_create_advertising"));
+			DialogMessage.showError(INSTANCE, Language.getText("err_create_advertising"));
 		}
 	}
 
@@ -583,7 +590,7 @@ public class appletviewer
 			if (debug) {
 				ex.printStackTrace();
 			}
-			DialogMessage.showError(frame, Language.getText("err_save_file"));
+			DialogMessage.showError(INSTANCE, Language.getText("err_save_file"));
 		} finally {
 			if (writer != null) {
 				try {
@@ -595,7 +602,7 @@ public class appletviewer
 		}
 	}
 
-	private static void resize()
+	private void resize()
 	{
 		int advertHeight = (_browserCanvas == null ? 0 : Integer.parseInt(configClient.get("advert_height")));
 		int footerHeight = 40;
@@ -664,7 +671,7 @@ public class appletviewer
 			if (debug) {
 				localException.printStackTrace();
 			}
-			DialogMessage.showError(frame, Language.getText("err_downloading") + ": " + fileName);
+			DialogMessage.showError(INSTANCE, Language.getText("err_downloading") + ": " + fileName);
 		}
 
 		byte[] fileData = new byte[bufferOffset];
@@ -672,12 +679,12 @@ public class appletviewer
 		return fileData;
 	}
 
-	public static void showUrl(String url, String target)
+	public void showUrl(String url, String target)
 	{
 		// quit url
 		if (target != null && target.equals("_top") && (url.endsWith("MAGICQUIT") || url.indexOf("/quit.ws") != -1 || (url.indexOf(".ws") == -1 && url.endsWith("/")))) {
 			// exit application
-			appletviewer.terminate();
+			terminate();
 		} else if (url.startsWith("http://") || url.startsWith("https://")) {
 			// we only open http or https urls
 			try {
@@ -685,17 +692,17 @@ public class appletviewer
 				Desktop.getDesktop().browse(new URI(url));
 			} catch (URISyntaxException ex) {
 				// ignore invalid url
-				if (appletviewer.debug) {
+				if (debug) {
 					ex.printStackTrace();
 				}
 			} catch (Exception ex) {
 				// default browser could not be opened for some reason
-				if (appletviewer.debug) {
+				if (debug) {
 					ex.printStackTrace();
 				}
 
 				// show a window for user to copy/paste the url
-				new DialogUrl(url);
+				new DialogUrl(this, url);
 			}
 		}
 	}
@@ -704,7 +711,7 @@ public class appletviewer
 	public void actionPerformed(ActionEvent e)
 	{
 		// currently in use by the language menu
-		new DialogLanguage(appletviewer.frame, appletviewer.languages);
+		new DialogLanguage(appletviewer.INSTANCE, appletviewer.languages);
 	}
 
 	@Override

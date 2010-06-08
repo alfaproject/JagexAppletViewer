@@ -15,11 +15,11 @@ public class JSObjec_
 		if (methodName.equals("zap")) {
 			Preferences.set("Member", "yes");
 			Preferences.save();
-			appletviewer.removeAdvert();
+			appletviewer.getInstance().removeAdvert();
 		} else if (methodName.equals("unzap")) {
 			Preferences.set("Member", "no");
 			Preferences.save();
-			appletviewer.reAddAdvert();
+			appletviewer.getInstance().reAddAdvert();
 		}
 
 		return null;

@@ -8,9 +8,9 @@ final class DialogUrl
 		implements WindowListener, ActionListener
 {
 
-	DialogUrl(String url)
+	DialogUrl(Frame owner, String url)
 	{
-		super(appletviewer.frame, Language.getText("information"), true);
+		super(owner, Language.getText("information"), true);
 
 		String message = Language.getText("copy_paste_url") + ":\n" + url;
 		TextArea textAreaUrl = new TextArea(message, 2, 50, TextArea.SCROLLBARS_HORIZONTAL_ONLY);
@@ -28,7 +28,7 @@ final class DialogUrl
 		this.addWindowListener(this);
 		this.setResizable(false);
 		this.pack();
-		this.setLocationRelativeTo(appletviewer.frame);
+		this.setLocationRelativeTo(owner);
 		this.setVisible(true);
 	}
 

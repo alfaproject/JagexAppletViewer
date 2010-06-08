@@ -22,7 +22,7 @@ final class GameAppletStub
 		if (appletviewer.debug) {
 			System.out.println("GameAppletStub.showDocument(url = " + url + ")");
 		}
-		appletviewer.showUrl(url.toString(), null);
+		appletviewer.getInstance().showUrl(url.toString(), null);
 	}
 
 	@Override
@@ -31,7 +31,7 @@ final class GameAppletStub
 		if (appletviewer.debug) {
 			System.out.println("GameAppletStub.showDocument(url = " + url + ", target = " + target + ")");
 		}
-		appletviewer.showUrl(url.toString(), target);
+		appletviewer.getInstance().showUrl(url.toString(), target);
 	}
 
 	@Override
