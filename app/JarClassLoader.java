@@ -6,12 +6,12 @@ import java.security.CodeSource;
 import java.security.Permissions;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 final class JarClassLoader
 		extends ClassLoader
 {
-	private Hashtable<String, Class<?>> _loadedClasses = new Hashtable<String, Class<?>>();
+	private HashMap<String, Class<?>> _loadedClasses = new HashMap<String, Class<?>>();
 	private ProtectionDomain _protectionDomain;
 	private JavaArchive _jar;
 
@@ -57,8 +57,3 @@ final class JarClassLoader
 		_protectionDomain = new ProtectionDomain(new CodeSource(null, (Certificate[]) null), permissions);
 	}
 }
-
-/*
- * Location: \\.psf\Home\Documents\java\jagexappletviewer\ Qualified Name:
- * app.Class_s JD-Core Version: 0.5.4
- */
