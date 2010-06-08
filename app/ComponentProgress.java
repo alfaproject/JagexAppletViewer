@@ -78,8 +78,3 @@ class ComponentProgress
 		}
 	}
 }
-
-/*
- * Location: \\.psf\Home\Documents\java\jagexappletviewer\ Qualified Name:
- * app.Class_o JD-Core Version: 0.5.4
- */
