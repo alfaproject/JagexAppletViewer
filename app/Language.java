@@ -33,11 +33,11 @@ final class Language
 				_texts.put("quit", "Quitter");
 				break;
 			case 3:
-				_texts.put("err_missing_config", "Faltando configuraÁ„o de com.jagex.config");
-				_texts.put("err_invalid_config", "ConfiguraÁ„o inv·lida de com.jagex.config");
-				_texts.put("loading_config", "Carregando configuraÁ„o");
-				_texts.put("err_load_config", "Erro ao carregar configuraÁ„o");
-				_texts.put("err_decode_config", "Erro ao decodificar configuraÁ„o");
+				_texts.put("err_missing_config", "Faltando configura√ß√£o de com.jagex.config");
+				_texts.put("err_invalid_config", "Configura√ß√£o inv√°lida de com.jagex.config");
+				_texts.put("loading_config", "Carregando configura√ß√£o");
+				_texts.put("err_load_config", "Erro ao carregar configura√ß√£o");
+				_texts.put("err_decode_config", "Erro ao decodificar configura√ß√£o");
 				_texts.put("loaderbox_initial", "Carregando...");
 				_texts.put("error", "Erro");
 				_texts.put("quit", "Fechar");
