@@ -49,6 +49,7 @@ public class appletviewer
 		MenuBar menuBar = new MenuBar();
 		setMenuBar(menuBar);
 
+		// OPTIONS MENU
 		Menu menuOptions = new Menu(Language.getText("options"));
 		menuBar.add(menuOptions);
 
@@ -78,6 +79,45 @@ public class appletviewer
 			});
 			menuOptions.add(menuLanguage);
 		}
+
+		// VIEW MENU
+		Menu menuView = new Menu("View");
+		menuBar.add(menuView);
+
+		String prefCopyright = Preferences.get("ShowCopyright");
+		if (prefCopyright == null) {
+			prefCopyright = "yes";
+		}
+		CheckboxMenuItem menuCopyright = new CheckboxMenuItem("Copyright", prefCopyright.equals("yes"));
+		menuCopyright.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					Preferences.set("ShowCopyright", "yes");
+					showFooter();
+				} else {
+					Preferences.set("ShowCopyright", "no");
+					hideFooter();
+				}
+				Preferences.save();
+			}
+		});
+		menuView.add(menuCopyright);
+	}
+
+	private void showFooter()
+	{
+		setSize(getSize().width, getSize().height + 40);
+		_footerPanel = new CopyrightBar(Language.getText("tandc"));
+		_panel.add(_footerPanel);
+		resize();
+	}
+
+	private void hideFooter()
+	{
+		_footerPanel.setVisible(false);
+		_panel.remove(_footerPanel);
+		_footerPanel = null;
+		setSize(getSize().width, getSize().height - 40);
 	}
 
 	private void loadConfiguration()
@@ -451,10 +491,9 @@ public class appletviewer
 		int advertHeight = (inWindows ? Integer.parseInt(_configClient.get("advert_height")) : 0);
 		int preferredWidth = Integer.parseInt(_configClient.get("window_preferredwidth"));
 		int preferredHeight = Integer.parseInt(_configClient.get("window_preferredheight"));
-		int footerPadding = 40;
 
 		Insets insets = this.getInsets();
-		this.setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + footerPadding + insets.top + insets.bottom);
+		this.setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + insets.top + insets.bottom);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		_scrollPane = new ScrollPane();
@@ -472,9 +511,13 @@ public class appletviewer
 		}
 
 		_panel.add(_gameApplet);
-		_footerPanel = new CopyrightBar(Language.getText("tandc"));
-		_panel.add(_footerPanel);
-		this.doLayout();
+
+		String showCopyright = Preferences.get("ShowCopyright");
+		if (showCopyright == null || showCopyright.equals("yes")) {
+			showFooter();
+		}
+
+		doLayout();
 		resize();
 		_scrollPane.doLayout();
 
@@ -619,7 +662,7 @@ public class appletviewer
 	private void resize()
 	{
 		int advertHeight = (_browserCanvas == null ? 0 : Integer.parseInt(_configClient.get("advert_height")));
-		int footerHeight = 40;
+		int footerHeight = (_footerPanel == null ? 0 : 40);
 
 		int appletMinWidth = Integer.parseInt(_configClient.get("applet_minwidth"));
 		int appletMinHeight = Integer.parseInt(_configClient.get("applet_minheight"));
@@ -664,7 +707,9 @@ public class appletviewer
 			}
 		}
 		_gameApplet.setBounds((panelWidth - appletWidth) / 2, advertHeight, appletWidth, appletHeight);
-		_footerPanel.setBounds((panelWidth - appletWidth) / 2, advertHeight + appletHeight, appletWidth, footerHeight);
+		if (_footerPanel != null) {
+			_footerPanel.setBounds((panelWidth - appletWidth) / 2, advertHeight + appletHeight, appletWidth, footerHeight);
+		}
 	}
 
 	private byte[] downloadFile(String fileName, String baseUrl)
