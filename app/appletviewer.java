@@ -113,7 +113,6 @@ public class appletviewer
 
 	private void hideFooter()
 	{
-		_footerPanel.setVisible(false);
 		_panel.remove(_footerPanel);
 		_footerPanel = null;
 		setSize(getSize().width, getSize().height - 40);
@@ -497,7 +496,7 @@ public class appletviewer
 		this.setVisible(true);
 
 		_panel = new Panel();
-		_panel.setBackground(Color.red);
+		_panel.setBackground(Color.black);
 		_panel.setLayout(null);
 		add(_panel);
 
@@ -543,7 +542,7 @@ public class appletviewer
 		}
 
 		this.addWindowListener(this);
-		addComponentListener(new appletviewer());
+		addComponentListener(this);
 		_gameApplet.setStub(new GameAppletStub(_configClient, _configApplet));
 		_gameApplet.init();
 		_gameApplet.start();
@@ -662,51 +661,21 @@ public class appletviewer
 		int advertHeight = (_browserCanvas == null ? 0 : Integer.parseInt(_configClient.get("advert_height")));
 		int footerHeight = (_footerPanel == null ? 0 : 40);
 
-		int appletMinWidth = Integer.parseInt(_configClient.get("applet_minwidth"));
-		int appletMinHeight = Integer.parseInt(_configClient.get("applet_minheight"));
-		int appletMaxWidth = Integer.parseInt(_configClient.get("applet_maxwidth"));
-		int appletMaxHeight = Integer.parseInt(_configClient.get("applet_maxheight"));
+		Dimension frameSize = getSize();
+		Insets frameInsets = getInsets();
 
-		Dimension paneSize = getSize();
-		Insets paneInsets = getInsets();
+		int appletWidth = frameSize.width - frameInsets.left - frameInsets.right;
+		int appletHeight = frameSize.height - frameInsets.top - frameInsets.bottom - advertHeight - footerHeight;
 
-		int availableWidth = paneSize.width - paneInsets.left - paneInsets.right;
-		int availableHeight = paneSize.height - paneInsets.top + -paneInsets.bottom;
-
-		int appletWidth = availableWidth;
-		if (appletWidth < appletMinWidth) {
-			appletWidth = appletMinWidth;
-		} else if (appletWidth > appletMaxWidth) {
-			appletWidth = appletMaxWidth;
-		}
-
-		int appletHeight = availableHeight - advertHeight - footerHeight;
-		if (appletHeight < appletMinHeight) {
-			appletHeight = appletMinHeight;
-		} else if (appletHeight > appletMaxHeight) {
-			appletHeight = appletMaxHeight;
-		}
-
-		int panelWidth = availableWidth;
-		if (panelWidth < appletMinWidth) {
-			panelWidth = appletMinWidth;
-		}
-
-		int panelHeight = availableHeight;
-		if (panelHeight < footerHeight + appletMinHeight + advertHeight) {
-			panelHeight = footerHeight + appletMinHeight + advertHeight;
-		}
-
-		_panel.setSize(panelWidth, panelHeight);
 		if (_browserCanvas != null) {
-			_browserCanvas.setBounds((panelWidth - appletWidth) / 2, 0, appletWidth, advertHeight);
+			_browserCanvas.setBounds(0, 0, appletWidth, advertHeight);
 			if (browsercontrol.iscreated()) {
-				browsercontrol.resize(appletWidth, appletHeight);
+				browsercontrol.resize(appletWidth, advertHeight);
 			}
 		}
-		_gameApplet.setBounds((panelWidth - appletWidth) / 2, advertHeight, appletWidth, appletHeight);
+		_gameApplet.setBounds(0, advertHeight, appletWidth, appletHeight);
 		if (_footerPanel != null) {
-			_footerPanel.setBounds((panelWidth - appletWidth) / 2, advertHeight + appletHeight, appletWidth, footerHeight);
+			_footerPanel.setBounds(0, advertHeight + appletHeight, appletWidth, footerHeight);
 		}
 	}
 
