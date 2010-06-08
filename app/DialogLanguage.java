@@ -1,13 +1,20 @@
 package app;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Choice;
+import java.awt.Dialog;
+import java.awt.GridLayout;
+import java.awt.Panel;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Map;
 
-final class DialogLanguage
+class DialogLanguage
 	extends Dialog
-	implements ActionListener
 {
 
 	private Map<Integer, String> _languages;
@@ -15,9 +22,9 @@ final class DialogLanguage
 
 	private Choice _choiceLanguage;
 
-	public DialogLanguage(Frame owner, Map<Integer, String> languages)
+	public DialogLanguage(Window owner, Map<Integer, String> languages)
 	{
-		super(owner, Language.getText("language"), true);
+		super(owner, Language.getText("language"), Dialog.DEFAULT_MODALITY_TYPE);
 		_languages = languages;
 		
 		_choiceLanguage = new Choice();
@@ -33,50 +40,64 @@ final class DialogLanguage
 		}
 		_choiceLanguage.select(_languages.get(_savedLangId));
 
+		// ok button
 		Button buttonOk = new Button(Language.getText("ok"));
-		buttonOk.setActionCommand("ok");
-		buttonOk.addActionListener(this);
+		buttonOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveLanguage();
+				close();
+			}
+		});
 
+		// cancel button
 		Button buttonCancel = new Button(Language.getText("cancel"));
-		buttonCancel.addActionListener(this);
+		buttonOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				close();
+			}
+		});
 
+		// buttons panel
 		Panel panelButtons = new Panel();
 		panelButtons.setLayout(new GridLayout(1, 2));
 		panelButtons.add(buttonOk);
 		panelButtons.add(buttonCancel);
 
-		this.add(_choiceLanguage, BorderLayout.CENTER);
-		this.add(panelButtons, BorderLayout.SOUTH);
-		this.setSize(200, 150);
-		this.setLocationRelativeTo(owner);
-		this.setVisible(true);
+		// dialog
+		addWindowListener(new WindowAdapter() {
+			@Override public void windowClosing(WindowEvent e) {
+				close();
+			}
+		});
+
+		add(_choiceLanguage, BorderLayout.CENTER);
+		add(panelButtons, BorderLayout.SOUTH);
+		pack();
+		setLocationRelativeTo(owner);
+		setVisible(true);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e)
+	private void close()
 	{
-		if (e.getActionCommand().equals("ok")) {
-			Integer selectedLangId = 0;
-		    for (Integer langId : _languages.keySet()) {
-			    if (_languages.get(langId).equals(_choiceLanguage.getSelectedItem())) {
-				    selectedLangId = langId;
-				    break;
-			    }
-		    }
+		setVisible(false);
+		dispose();
+	}
 
-			// save the new language id and warn about restarting the application
-			if (!selectedLangId.equals(_savedLangId)) {
-				Preferences.set("Language", selectedLangId.toString());
-				Preferences.save();
-				DialogMessage.showMessage(this, Language.getText("changes_on_restart"));
+	private void saveLanguage()
+	{
+		Integer selectedLangId = 0;
+		for (Integer langId : _languages.keySet()) {
+			if (_languages.get(langId).equals(_choiceLanguage.getSelectedItem())) {
+				selectedLangId = langId;
+				break;
 			}
 		}
-		this.setVisible(false);
-		this.dispose();
+
+		// save the new language id and warn about restarting the application
+		if (!selectedLangId.equals(_savedLangId)) {
+			Preferences.set("Language", selectedLangId.toString());
+			Preferences.save();
+			DialogMessage.showMessage(this, Language.getText("changes_on_restart"));
+		}
 	}
 }
-
-/*
- * Location: \\.psf\Home\Documents\java\jagexappletviewer\ Qualified Name:
- * app.Class_j JD-Core Version: 0.5.4
- */
