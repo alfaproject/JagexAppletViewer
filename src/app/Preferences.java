@@ -55,6 +55,15 @@ public final class Preferences
 		return _preferences.get(name);
 	}
 
+	public static String get(final String name, final String defaultValue)
+	{
+		String value = _preferences.get(name);
+		if (value == null) {
+			return defaultValue;
+		}
+		return value;
+	}
+
 	public static void save()
 	{
 		PrintStream writer = null;

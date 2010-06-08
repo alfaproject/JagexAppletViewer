@@ -519,11 +519,11 @@ public class appletviewer
 
 		// calculate frame size
 		int advertHeight = (inWindows ? Integer.parseInt(_configClient.get("advert_height")) : 0);
-		int preferredWidth = Integer.parseInt(_configClient.get("window_preferredwidth"));
-		int preferredHeight = Integer.parseInt(_configClient.get("window_preferredheight"));
+		int preferredWidth = Integer.parseInt(Preferences.get("frameWidth", _configClient.get("window_preferredwidth")));
+		int preferredHeight = Integer.parseInt(Preferences.get("frameHeight", _configClient.get("window_preferredheight")));
 
 		Insets insets = getInsets();
-		setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + footerHeight + insets.top + insets.bottom);
+		setSize(preferredWidth, preferredHeight + advertHeight + footerHeight);
 		setLocationRelativeTo(null);
 
 		add(_panel);
@@ -561,7 +561,7 @@ public class appletviewer
 				if (appletviewer.debug) {
 					ex.printStackTrace();
 				}
-				DialogMessage.showError(this, Language.getText("err_create_advertising"));
+				DialogMessage.showMessage(this, Language.getText("err_create_advertising"));
 			}
 		}
 	}
@@ -646,9 +646,17 @@ public class appletviewer
 
 	public static void terminate()
 	{
+		// dispose browsercontrol
 		if (browsercontrol.iscreated()) {
 			browsercontrol.destroy();
 		}
+
+		// save current size
+		Dimension size = INSTANCE.getSize();
+		Preferences.set("frameWidth", Integer.toString(size.width));
+		Preferences.set("frameHeight", Integer.toString(size.height - (INSTANCE._browserCanvas == null ? 0 : INSTANCE._browserCanvas.getSize().height) - (INSTANCE._footerPanel == null ? 0 : 40)));
+		Preferences.save();
+
 		System.exit(0);
 	}
 
