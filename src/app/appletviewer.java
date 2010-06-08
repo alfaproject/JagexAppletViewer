@@ -44,6 +44,10 @@ public class appletviewer
 
 	private void buildMenu()
 	{
+		if (Preferences.get("hideMenu", "no").equals("yes")) {
+			return;
+		}
+
 		MenuBar menuBar = new MenuBar();
 		setMenuBar(menuBar);
 
