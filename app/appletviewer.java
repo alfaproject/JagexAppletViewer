@@ -10,7 +10,7 @@ import java.util.*;
 import nativeadvert.browsercontrol;
 
 public class appletviewer
-		implements ComponentListener, ActionListener
+		implements ComponentListener, WindowListener, ActionListener
 {
 	public static boolean debug = false;
 
@@ -480,7 +480,7 @@ public class appletviewer
 			}
 		}
 
-		frame.addWindowListener(TerminateEventHandler.getInstance());
+		frame.addWindowListener(this);
 		_scrollPane.addComponentListener(new appletviewer());
 		_gameApplet.setStub(new GameAppletStub());
 		_gameApplet.init();
@@ -672,13 +672,6 @@ public class appletviewer
 		return fileData;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		// currently in use by the language menu
-		new DialogLanguage(appletviewer.frame, appletviewer.languages);
-	}
-
 	public static void showUrl(String url, String target)
 	{
 		// quit url
@@ -705,5 +698,48 @@ public class appletviewer
 				new DialogUrl(url);
 			}
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		// currently in use by the language menu
+		new DialogLanguage(appletviewer.frame, appletviewer.languages);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e)
+	{
+		terminate();
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e)
+	{
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e)
+	{
 	}
 }
