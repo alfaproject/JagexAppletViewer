@@ -578,15 +578,23 @@ public class appletviewer
 
 	private static void saveFile(byte[] fileData, File filePath)
 	{
+		FileOutputStream writer = null;
 		try {
-			FileOutputStream writer = new FileOutputStream(filePath);
+			writer = new FileOutputStream(filePath);
 			writer.write(fileData, 0, fileData.length);
-			writer.close();
 		} catch (Exception ex) {
 			if (Debug) {
 				ex.printStackTrace();
 			}
 			DialogMessage.showError(Window, Language.getText("err_save_file"));
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (Exception ex) {
+					// ignore
+				}
+			}
 		}
 	}
 
