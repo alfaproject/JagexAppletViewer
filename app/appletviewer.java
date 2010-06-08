@@ -29,7 +29,6 @@ public class appletviewer
 	// interface elements
 	private Panel _panel;
 	private Component _footerPanel;
-	private ScrollPane _scrollPane;
 	private Canvas _browserCanvas;
 	private Applet _gameApplet;
 
@@ -496,12 +495,11 @@ public class appletviewer
 		this.setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + insets.top + insets.bottom);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
-		_scrollPane = new ScrollPane();
-		this.add(_scrollPane);
+
 		_panel = new Panel();
 		_panel.setBackground(Color.red);
 		_panel.setLayout(null);
-		_scrollPane.add(_panel);
+		add(_panel);
 
 		// display the browser canvas if the user isn't a member
 		String member = Preferences.get("Member");
@@ -519,7 +517,7 @@ public class appletviewer
 
 		doLayout();
 		resize();
-		_scrollPane.doLayout();
+		doLayout();
 
 		// display the browser control with advertising
 		if (inWindows && _browserCanvas != null) {
@@ -545,7 +543,7 @@ public class appletviewer
 		}
 
 		this.addWindowListener(this);
-		_scrollPane.addComponentListener(new appletviewer());
+		addComponentListener(new appletviewer());
 		_gameApplet.setStub(new GameAppletStub(_configClient, _configApplet));
 		_gameApplet.init();
 		_gameApplet.start();
@@ -669,8 +667,8 @@ public class appletviewer
 		int appletMaxWidth = Integer.parseInt(_configClient.get("applet_maxwidth"));
 		int appletMaxHeight = Integer.parseInt(_configClient.get("applet_maxheight"));
 
-		Dimension paneSize = _scrollPane.getSize();
-		Insets paneInsets = _scrollPane.getInsets();
+		Dimension paneSize = getSize();
+		Insets paneInsets = getInsets();
 
 		int availableWidth = paneSize.width - paneInsets.left - paneInsets.right;
 		int availableHeight = paneSize.height - paneInsets.top + -paneInsets.bottom;
