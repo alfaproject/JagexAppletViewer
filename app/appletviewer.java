@@ -535,7 +535,7 @@ public class appletviewer
 
 			// create the browser control in the browser canvas
 			try {
-				System.load(browserControlPath.getPath());
+				System.load(browserControlPath.getAbsolutePath());
 				browsercontrol.create(_browserCanvas, _configClient.get("adverturl"));
 				browsercontrol.resize(_browserCanvas.getSize().width, _browserCanvas.getSize().height);
 			} catch (Throwable ex) {
