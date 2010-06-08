@@ -54,8 +54,8 @@ final class DialogDebug
 	@Override
 	public final void windowClosing(WindowEvent e)
 	{
-		//_frame.dispose();
-		//_frame = null;
+		_frame.dispose();
+		_frame = null;
 	}
 
 	@Override
