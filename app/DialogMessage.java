@@ -39,7 +39,7 @@ final class DialogMessage
 
 	public static void showError(Window owner, String message)
 	{
-		ProgressComponent.hideDialog();
+		appletviewer.progressDialog.dispose();
 		new DialogMessage(owner, Language.getText("error"), message, Language.getText("quit"), "quit");
 	}
 

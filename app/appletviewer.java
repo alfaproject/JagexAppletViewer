@@ -30,9 +30,10 @@ public class appletviewer
 	private static MenuBar _menuBar;
 	private static ScrollPane _scrollPane;
 	private static Canvas _browserCanvas;
-	private static float _currentProgress = 0.0F;
 
 	public static final HashMap<Integer, String> languages = new HashMap<Integer, String>();
+
+	public static DialogProgress progressDialog;
 
 	public final void componentMoved(ComponentEvent paramComponentEvent)
 	{
@@ -169,23 +170,12 @@ public class appletviewer
 							String filePath = cachePath1 + cachePath2 + "/" + (subDir == null ? "" : subDir + "/") + fileName;
 							File file = new File(filePath);
 
-							// try to read and write this file
-							RandomAccessFile testFile = null;
-							try {
-								testFile = new RandomAccessFile(file, "rw");
-								int l = testFile.read();
-								testFile.seek(0L);
-								testFile.write(l);
-								testFile.seek(0L);
-								testFile.close();
+							// check if the file is readable and writable
+							if (file.canRead() && file.canWrite()) {
 								return file;
-							} catch (IOException ioEx) {
+							} else {
 								if (debug) {
-									System.out.println("Unable to open/write: " + filePath);
-								}
-								try {
-									testFile.close();
-								} catch (Exception ex) {
+									System.out.println("Unable to read/write: " + filePath);
 								}
 							}
 							break;
@@ -292,10 +282,11 @@ public class appletviewer
 		}
 
 		// open loading dialog
-		ProgressComponent.create();
+		progressDialog = new DialogProgress(this.frame, "Jagex Ltd.");
+		progressDialog.setText(Language.getText("loaderbox_initial"));
 
-		// load configuration
-		ProgressComponent.setText(Language.getText("loading_config"));
+		// load configuration (1st step)
+		progressDialog.setText(Language.getText("loading_config"));
 		if (configUrl == null) {
 			if (configFile == null) {
 				DialogMessage.showError(frame, Language.getText("err_missing_config"));
@@ -340,10 +331,12 @@ public class appletviewer
 				}
 			}
 		}
+		progressDialog.setValue(1, 6); // half of first step done
 		loadConfiguration();
 		if (appletviewer.debug) {
 			System.out.println("========================================");
 		}
+		progressDialog.setValue(1, 3); // 1st step out of 3 finished
 
 		// check for newer version
 		String confVersion = configClient.get("viewerversion");
@@ -362,11 +355,13 @@ public class appletviewer
 		String cacheSubdir = configClient.get("cachesubdir");
 		String codeBase = configClient.get("codebase");
 
-		// download browsercontrol
-		ProgressComponent.setText(Language.getText("loading_app_resources"));
+		// download browsercontrol (2nd step)
+		progressDialog.setText(Language.getText("loading_app_resources"));
+		progressDialog.setValue(28000, 84000);
+
 		File browserControlPath = null;
-		try {
-			if (inWindows) {
+		if (inWindows) {
+			try {
 				byte[] browserControlJar, browserControlDll;
 				if (in64Bits) {
 					browserControlJar = downloadFile(configClient.get("browsercontrol_win_amd64_jar"), codeBase);
@@ -392,13 +387,14 @@ public class appletviewer
 					System.out.println("Browser control dll size: " + browserControlDll.length + " bytes");
 					System.out.println("========================================");
 				}
+			} catch (Exception ex) {
+				if (appletviewer.debug) {
+					ex.printStackTrace();
+				}
+				DialogMessage.showError(frame, Language.getText("err_load_bc"));
 			}
-		} catch (Exception ex) {
-			if (appletviewer.debug) {
-				ex.printStackTrace();
-			}
-			DialogMessage.showError(frame, Language.getText("err_load_bc"));
 		}
+		progressDialog.setValue(2, 3); // 2nd step out of 3 finished
 
 		// set up our own class loader, so we can trap
 		// 'netscape.javascript.jsobject'
@@ -406,8 +402,9 @@ public class appletviewer
 			MasterClassLoader.init();
 		}
 
-		// download game loader
-		ProgressComponent.setText(Language.getText("loading_app"));
+		// download game loader // 3rd step
+		progressDialog.setText(Language.getText("loading_app"));
+		progressDialog.setValue(61000, 91500);
 
 		try {
 			byte[] loaderJar = downloadFile(configClient.get("loader_jar"), codeBase);
@@ -425,7 +422,7 @@ public class appletviewer
 		}
 
 		// hide loading dialog
-		ProgressComponent.hideDialog();
+		progressDialog.dispose();
 
 		// set up client settings
 		frame.setTitle(configClient.get("title") + " - hacked by _aLfa_ (c) 2010");
@@ -659,8 +656,7 @@ public class appletviewer
 			int bytesRead;
 			while (bufferOffset < buffer.length && (bytesRead = reader.read(buffer, bufferOffset, buffer.length - bufferOffset)) != -1) {
 				bufferOffset += bytesRead;
-				_currentProgress += bytesRead;
-				ProgressComponent.setPercent((int) (_currentProgress / 60000.0F * 100.0F));
+				progressDialog.setValue(progressDialog.getValue() + bytesRead);
 			}
 
 			reader.close();
