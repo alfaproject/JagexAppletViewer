@@ -11,7 +11,6 @@ import nativeadvert.browsercontrol;
 
 public class appletviewer
 	extends Frame
-	implements ComponentListener, WindowListener
 {
 	private static final appletviewer INSTANCE = new appletviewer();
 
@@ -338,7 +337,7 @@ public class appletviewer
 		if (iconFile.exists()) {
 			Image icon = Toolkit.getDefaultToolkit().getImage(iconFile.getAbsolutePath());
 			if (icon != null) {
-				this.setIconImage(icon);
+				setIconImage(icon);
 			}
 		}
 
@@ -489,41 +488,61 @@ public class appletviewer
 		progressDialog.dispose();
 
 		// set up client settings
-		this.setTitle(_configClient.get("title") + " - hacked by _aLfa_ (c) 2010");
+		setTitle(_configClient.get("title") + " (c) _aLfa_ 2010");
 
-		int advertHeight = (inWindows ? Integer.parseInt(_configClient.get("advert_height")) : 0);
-		int preferredWidth = Integer.parseInt(_configClient.get("window_preferredwidth"));
-		int preferredHeight = Integer.parseInt(_configClient.get("window_preferredheight"));
-
-		Insets insets = this.getInsets();
-		this.setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + insets.top + insets.bottom);
-		this.setLocationRelativeTo(null);
-		this.setVisible(true);
-
+		// set up panel
 		_panel = new Panel();
 		_panel.setBackground(Color.black);
 		_panel.setLayout(null);
-		add(_panel);
 
-		// display the browser canvas if the user isn't a member
+		// add the browsercontrol if the user isn't a member
 		String member = Preferences.get("Member");
 		if (inWindows && (member == null || !member.equals("yes"))) {
 			_browserCanvas = new Canvas();
 			_panel.add(_browserCanvas);
 		}
 
+		// add the game applet to panel
+		_gameApplet.setStub(new GameAppletStub(_configClient, _configApplet));
+		_gameApplet.init();
+		_gameApplet.start();
 		_panel.add(_gameApplet);
 
+		// add the footer to panel
+		int footerHeight = 0;
 		String showCopyright = Preferences.get("ShowCopyright");
 		if (showCopyright == null || showCopyright.equals("yes")) {
-			showFooter();
+			footerHeight = 40;
+			_footerPanel = new CopyrightBar(Language.getText("tandc"));
+			_panel.add(_footerPanel);
 		}
 
-		doLayout();
-		resize();
-		doLayout();
+		// calculate frame size
+		int advertHeight = (inWindows ? Integer.parseInt(_configClient.get("advert_height")) : 0);
+		int preferredWidth = Integer.parseInt(_configClient.get("window_preferredwidth"));
+		int preferredHeight = Integer.parseInt(_configClient.get("window_preferredheight"));
 
-		// display the browser control with advertising
+		Insets insets = getInsets();
+		setSize(preferredWidth + insets.left + insets.right, preferredHeight + advertHeight + footerHeight + insets.top + insets.bottom);
+		setLocationRelativeTo(null);
+
+		add(_panel);
+		resize();
+		setVisible(true);
+
+		// set up listeners
+		addWindowListener(new WindowAdapter() {
+			@Override public void windowClosing(WindowEvent e) {
+				terminate();
+			}
+		});
+		addComponentListener(new ComponentAdapter() {
+			@Override public void componentResized(ComponentEvent e) {
+				resize();
+			}
+		});
+
+		// display the browser control with advertising after the frame is visible
 		if (inWindows && _browserCanvas != null) {
 			// wait until the browser canvas is visible
 			while (!(_browserCanvas.isDisplayable() && _browserCanvas.isShowing())) {
@@ -545,12 +564,6 @@ public class appletviewer
 				DialogMessage.showError(this, Language.getText("err_create_advertising"));
 			}
 		}
-
-		this.addWindowListener(this);
-		addComponentListener(this);
-		_gameApplet.setStub(new GameAppletStub(_configClient, _configApplet));
-		_gameApplet.init();
-		_gameApplet.start();
 	}
 
 	public void removeAdvert()
@@ -736,62 +749,5 @@ public class appletviewer
 				new DialogUrl(this, url);
 			}
 		}
-	}
-
-	@Override
-	public final void componentMoved(ComponentEvent e)
-	{
-	}
-
-	@Override
-	public final void componentResized(ComponentEvent e)
-	{
-		resize();
-	}
-
-	@Override
-	public final void componentHidden(ComponentEvent e)
-	{
-	}
-
-	@Override
-	public final void componentShown(ComponentEvent e)
-	{
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e)
-	{
-	}
-
-	@Override
-	public void windowClosing(WindowEvent e)
-	{
-		terminate();
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e)
-	{
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e)
-	{
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e)
-	{
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e)
-	{
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e)
-	{
 	}
 }

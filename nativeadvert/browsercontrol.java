@@ -7,20 +7,20 @@ public class browsercontrol
 	private static boolean error = false;
 	private static boolean iscreated = false;
 
-	private static native void resize0(int paramInt1, int paramInt2);
+	private static native void resize0(int width, int height);
 
 	private static native void destroy0();
 
-	private static native void navigate0(String paramString);
+	private static native void navigate0(String url);
 
-	private static native boolean browsercontrol0(Canvas paramCanvas, String paramString);
+	private static native boolean browsercontrol0(Canvas canvas, String url);
 
-	public static void resize(int paramInt1, int paramInt2)
+	public static void resize(int width, int height)
 	{
 		if (!iscreated) {
 			throw new IllegalStateException();
 		}
-		resize0(paramInt1, paramInt2);
+		resize0(width, height);
 	}
 
 	public static boolean iscreated()
@@ -28,15 +28,15 @@ public class browsercontrol
 		return iscreated;
 	}
 
-	public static void navigate(String paramString)
+	public static void navigate(String url)
 	{
 		if (!iscreated) {
 			throw new IllegalStateException();
 		}
-		navigate0(paramString);
+		navigate0(url);
 	}
 
-	public static boolean create(Canvas paramCanvas, String paramString)
+	public static boolean create(Canvas canvas, String url)
 	{
 		if (iscreated) {
 			throw new IllegalStateException();
@@ -45,13 +45,13 @@ public class browsercontrol
 			return false;
 		}
 
-		boolean bool = browsercontrol0(paramCanvas, paramString);
-		if (!bool) {
+		boolean success = browsercontrol0(canvas, url);
+		if (!success) {
 			error = true;
 		} else {
 			iscreated = true;
 		}
-		return bool;
+		return success;
 	}
 
 	public static void destroy()
@@ -63,8 +63,3 @@ public class browsercontrol
 		iscreated = false;
 	}
 }
-
-/*
- * Location: \\.psf\Home\Documents\java\jagexappletviewer\ Qualified Name:
- * nativeadvert.browsercontrol JD-Core Version: 0.5.4
- */

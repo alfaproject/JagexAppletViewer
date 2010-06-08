@@ -21,10 +21,6 @@ final class MasterClassLoader
 	public final Class<?> loadClass(String name)
 			throws ClassNotFoundException
 	{
-		if (appletviewer.debug) {
-			System.out.println("MasterClassLoader.loadClass(name = " + name + ")");
-		}
-
 		if (name.equals("netscape.javascript.JSObject")) {
 			Permissions permissions = new Permissions();
 			permissions.add(new AllPermission());
