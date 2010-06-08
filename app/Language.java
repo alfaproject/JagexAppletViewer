@@ -1,11 +1,11 @@
 package app;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Set;
 
 final class Language
 {
-	private static Hashtable<String, String> _texts = new Hashtable<String, String>();
+	private static HashMap<String, String> _texts = new HashMap<String, String>();
 
 	public static void load(int languageId)
 	{
