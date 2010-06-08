@@ -355,7 +355,7 @@ public class appletviewer
 				byte[] browserControlJar, browserControlDll;
 				if (in64Bits) {
 					browserControlJar = downloadFile(_configClient.get("browsercontrol_win_amd64_jar"), codeBase);
-					browserControlDll = new JavaArchive(browserControlJar).ExtractAndValidate("browsercontrol64.dll");
+					browserControlDll = new JavaArchive(browserControlJar).Extract("browsercontrol64.dll");
 					if (browserControlDll == null) {
 						DialogMessage.showError(this, Language.getText("err_verify_bc64"));
 					}
@@ -364,7 +364,7 @@ public class appletviewer
 					saveFile(browserControlDll, browserControlPath);
 				} else {
 					browserControlJar = downloadFile(_configClient.get("browsercontrol_win_x86_jar"), codeBase);
-					browserControlDll = new JavaArchive(browserControlJar).ExtractAndValidate("browsercontrol.dll");
+					browserControlDll = new JavaArchive(browserControlJar).Extract("browsercontrol.dll");
 					if (browserControlDll == null) {
 						DialogMessage.showError(this, Language.getText("err_verify_bc"));
 					}

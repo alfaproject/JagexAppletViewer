@@ -33,7 +33,7 @@ final class JarClassLoader
 		}
 
 		// try to load from jar
-		byte[] classData = _jar.ExtractAndValidate(name + ".class");
+		byte[] classData = _jar.Extract(name + ".class");
 		if (classData != null) {
 			cl = defineClass(name, classData, 0, classData.length, _protectionDomain);
 			if (resolve) {
