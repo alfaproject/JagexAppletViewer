@@ -2,6 +2,7 @@ package app;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,8 +11,8 @@ import java.util.HashMap;
 
 public final class Preferences
 {
-	private static HashMap<String, String> _preferences = new HashMap<String, String>();
-	private static File _preferencesFile = new File("jagexappletviewer.preferences");
+	private final static HashMap<String, String> _preferences = new HashMap<String, String>();
+	private final static File _preferencesFile = new File("jagexappletviewer.preferences");
 
 	public static void load()
 	{
@@ -25,6 +26,8 @@ public final class Preferences
 					_preferences.put(prefLine.substring(0, i), prefLine.substring(i - -1));
 				}
 			}
+		} catch (FileNotFoundException ex) {
+			// the file will eventually be created
 		} catch (Exception ex) {
             if (appletviewer.debug) {
                 ex.printStackTrace();
