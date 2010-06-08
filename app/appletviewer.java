@@ -10,8 +10,8 @@ import java.util.*;
 import nativeadvert.browsercontrol;
 
 public class appletviewer
-		extends Frame
-		implements ComponentListener, WindowListener, ActionListener
+	extends Frame
+	implements ComponentListener, WindowListener
 {
 	private static final appletviewer INSTANCE = new appletviewer();
 
@@ -29,7 +29,6 @@ public class appletviewer
 	// interface elements
 	private Panel _panel;
 	private Component _footerPanel;
-	private MenuBar _menuBar;
 	private ScrollPane _scrollPane;
 	private Canvas _browserCanvas;
 	private Applet _gameApplet;
@@ -43,6 +42,42 @@ public class appletviewer
 	public static appletviewer getInstance()
 	{
 		return INSTANCE;
+	}
+
+	private void buildMenu()
+	{
+		MenuBar menuBar = new MenuBar();
+		setMenuBar(menuBar);
+
+		Menu menuOptions = new Menu(Language.getText("options"));
+		menuBar.add(menuOptions);
+
+		// always on top menu
+		CheckboxMenuItem menuAlwaysOnTop = new CheckboxMenuItem("Always on top", Preferences.get("AlwaysOnTop").equals("yes"));
+		menuAlwaysOnTop.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					Preferences.set("AlwaysOnTop", "yes");
+					setAlwaysOnTop(true);
+				} else {
+					Preferences.set("AlwaysOnTop", "no");
+					setAlwaysOnTop(false);
+				}
+				Preferences.save();
+			}
+		});
+		menuOptions.add(menuAlwaysOnTop);
+
+		// create the language menu if we have languages
+		if (!_languages.isEmpty()) {
+			MenuItem menuLanguage = new MenuItem(Language.getText("language") + "...");
+			menuLanguage.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					new DialogLanguage(INSTANCE, _languages);
+				}
+			});
+			menuOptions.add(menuLanguage);
+		}
 	}
 
 	private void loadConfiguration()
@@ -120,18 +155,6 @@ public class appletviewer
 			} catch (Exception ex) {
 			}
 		}
-
-		// create the language dialog if we have languages
-		if (!_languages.isEmpty()) {
-			// build menu
-			_menuBar = new MenuBar();
-			Menu menuOptions = new Menu(Language.getText("options"));
-			MenuItem menuLanguage = new MenuItem(Language.getText("language") + "...");
-			menuLanguage.addActionListener(this);
-			menuOptions.add(menuLanguage);
-			_menuBar.add(menuOptions);
-			this.setMenuBar(_menuBar);
-		}
 	}
 
 	private BufferedReader getConfigReader()
@@ -208,6 +231,11 @@ public class appletviewer
 
 		// load saved preferences
 		Preferences.load();
+
+		// set always on top
+		if (Preferences.get("AlwaysOnTop").equals("yes")) {
+			setAlwaysOnTop(true);
+		}
 
 		// load or detect locale
 		int languageId = 0;
@@ -328,6 +356,9 @@ public class appletviewer
 		}
 		progressDialog.setValue(1, 3); // 1st step out of 3 finished
 
+		// build menu
+		buildMenu();
+
 		// check for newer version
 		String confVersion = _configClient.get("viewerversion");
 		if (confVersion != null) {
@@ -336,7 +367,7 @@ public class appletviewer
 				if (version > 100) {
 					DialogMessage.showMessage(this, Language.getText("new_version"));
 				}
-			} catch (NumberFormatException localNumberFormatException) {
+			} catch (NumberFormatException ex) {
 			}
 		}
 
@@ -688,13 +719,6 @@ public class appletviewer
 				new DialogUrl(this, url);
 			}
 		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		// currently in use by the language menu
-		new DialogLanguage(this, _languages);
 	}
 
 	@Override
