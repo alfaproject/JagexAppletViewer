@@ -24,7 +24,7 @@ final class DialogDebug
 
 	public static PrintStream getPrintStream(String dialogTitle)
 	{
-		INSTANCE._title = dialogTitle;
+		_title = dialogTitle;
 		return INSTANCE._printStream;
 	}
 
