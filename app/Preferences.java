@@ -31,7 +31,9 @@ public final class Preferences
             }
 		} finally {
 			try {
-				reader.close();
+				if (reader != null) {
+					reader.close();
+				}
 			} catch (Exception ex) {
                 if (appletviewer.debug) {
                     ex.printStackTrace();
