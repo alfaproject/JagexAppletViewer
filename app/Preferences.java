@@ -6,11 +6,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 public final class Preferences
 {
-	private static Hashtable<String, String> _preferences = new Hashtable<String, String>();
+	private static HashMap<String, String> _preferences = new HashMap<String, String>();
 	private static File _preferencesFile = new File("jagexappletviewer.preferences");
 
 	public static void load()
