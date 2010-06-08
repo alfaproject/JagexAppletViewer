@@ -8,7 +8,7 @@ public class JSObjec_
 {
 	public Object call(String methodName, Object[] args)
 	{
-		if (appletviewer.Debug) {
+		if (appletviewer.debug) {
 			System.out.println("JSObject.call(methodName = " + methodName + ", args.length = " + args.length + ");");
 		}
 
@@ -27,7 +27,7 @@ public class JSObjec_
 
 	public Object eval(String s)
 	{
-		if (appletviewer.Debug) {
+		if (appletviewer.debug) {
 			System.out.println("JSObject.eval(s = " + s + ");");
 		}
 

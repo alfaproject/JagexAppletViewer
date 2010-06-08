@@ -10,7 +10,7 @@ final class DialogUrl
 
 	DialogUrl(String url)
 	{
-		super(appletviewer.Window, Language.getText("information"), true);
+		super(appletviewer.frame, Language.getText("information"), true);
 
 		String message = Language.getText("copy_paste_url") + ":\n" + url;
 		TextArea textAreaUrl = new TextArea(message, 2, 50, TextArea.SCROLLBARS_HORIZONTAL_ONLY);
@@ -28,7 +28,7 @@ final class DialogUrl
 		this.addWindowListener(this);
 		this.setResizable(false);
 		this.pack();
-		this.setLocationRelativeTo(appletviewer.Window);
+		this.setLocationRelativeTo(appletviewer.frame);
 		this.setVisible(true);
 	}
 

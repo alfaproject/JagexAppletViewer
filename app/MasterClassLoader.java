@@ -21,7 +21,7 @@ final class MasterClassLoader
 	public final Class<?> loadClass(String name)
 			throws ClassNotFoundException
 	{
-		if (appletviewer.Debug) {
+		if (appletviewer.debug) {
 			System.out.println("MasterClassLoader.loadClass(name = " + name + ")");
 		}
 
@@ -61,13 +61,13 @@ final class MasterClassLoader
 
 				return defineClass(name, jsObjectClass, 0, jsObjectClass.length, protectionDomain);
 			} catch (IOException ioEx) {
-				if (appletviewer.Debug) {
+				if (appletviewer.debug) {
 					ioEx.printStackTrace();
 				}
 				try {
 					return super.getClass().getClassLoader().loadClass(name);
 				} catch (Exception ex) {
-                    if (appletviewer.Debug) {
+                    if (appletviewer.debug) {
                         ex.printStackTrace();
                     }
 				}
@@ -90,7 +90,7 @@ final class MasterClassLoader
 			scl.set(null, INSTANCE);
 			scl.setAccessible(false);
 		} catch (Exception ex) {
-			if (appletviewer.Debug) {
+			if (appletviewer.debug) {
 				ex.printStackTrace();
 			}
 		}

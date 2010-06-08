@@ -65,7 +65,7 @@ final class ProgressComponent
 				g.setColor(Color.white);
 				g.drawString(text, (size.width - _fontMetrics.stringWidth(text)) / 2, size.height / 2 + 4);
 			} catch (Exception ex) {
-                if (appletviewer.Debug) {
+                if (appletviewer.debug) {
                     ex.printStackTrace();
                 }
 			}
@@ -84,12 +84,12 @@ final class ProgressComponent
 		_instance._font = new Font("Helvetica", 1, 13);
 		_instance._fontMetrics = _instance.getFontMetrics(_instance._font);
 
-		_dialog = new Dialog(appletviewer.Window, "Jagex Ltd.", false);
+		_dialog = new Dialog(appletviewer.frame, "Jagex Ltd.", false);
 		_dialog.add(_instance);
 		_dialog.addWindowListener(TerminateEventHandler.getInstance());
 		_dialog.setResizable(false);
 		_dialog.setSize(320, 100);
-		_dialog.setLocationRelativeTo(appletviewer.Window);
+		_dialog.setLocationRelativeTo(appletviewer.frame);
 		_dialog.setVisible(true);
 	}
 

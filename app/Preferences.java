@@ -26,14 +26,14 @@ public final class Preferences
 				}
 			}
 		} catch (Exception ex) {
-            if (appletviewer.Debug) {
+            if (appletviewer.debug) {
                 ex.printStackTrace();
             }
 		} finally {
 			try {
 				reader.close();
 			} catch (Exception ex) {
-                if (appletviewer.Debug) {
+                if (appletviewer.debug) {
                     ex.printStackTrace();
                 }
 			}
@@ -59,7 +59,7 @@ public final class Preferences
 				writer.println(name + "=" + _preferences.get(name));
 			}
 		} catch (IOException ex) {
-			if (appletviewer.Debug) {
+			if (appletviewer.debug) {
 				ex.printStackTrace();
 			}
 		} finally {

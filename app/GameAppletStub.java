@@ -19,7 +19,7 @@ final class GameAppletStub
 	@Override
 	public final void showDocument(URL url)
 	{
-		if (appletviewer.Debug) {
+		if (appletviewer.debug) {
 			System.out.println("GameAppletStub.showDocument(url = " + url + ")");
 		}
 		appletviewer.showUrl(url.toString(), null);
@@ -28,7 +28,7 @@ final class GameAppletStub
 	@Override
 	public final void showDocument(URL url, String target)
 	{
-		if (appletviewer.Debug) {
+		if (appletviewer.debug) {
 			System.out.println("GameAppletStub.showDocument(url = " + url + ", target = " + target + ")");
 		}
 		appletviewer.showUrl(url.toString(), target);
@@ -37,8 +37,8 @@ final class GameAppletStub
 	@Override
 	public final String getParameter(String name)
 	{
-		String value = appletviewer.ConfigApplet.get(name);
-		if (appletviewer.Debug) {
+		String value = appletviewer.configApplet.get(name);
+		if (appletviewer.debug) {
 			System.out.println("GameAppletStub.getParameter(name = " + name + "):\tresult = " + value);
 		}
 		return value;
@@ -48,7 +48,7 @@ final class GameAppletStub
 	public final URL getCodeBase()
 	{
 		try {
-			return new URL(appletviewer.ConfigClient.get("codebase"));
+			return new URL(appletviewer.configClient.get("codebase"));
 		} catch (MalformedURLException ex) {
 			throw new InvalidParameterException();
 		}
@@ -58,7 +58,7 @@ final class GameAppletStub
 	public final URL getDocumentBase()
 	{
 		try {
-			return new URL(appletviewer.ConfigClient.get("codebase"));
+			return new URL(appletviewer.configClient.get("codebase"));
 		} catch (MalformedURLException ex) {
 			throw new InvalidParameterException();
 		}
