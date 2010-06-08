@@ -53,7 +53,11 @@ public class appletviewer
 		menuBar.add(menuOptions);
 
 		// always on top menu
-		CheckboxMenuItem menuAlwaysOnTop = new CheckboxMenuItem("Always on top", Preferences.get("AlwaysOnTop").equals("yes"));
+		String prefAlwaysOnTop = Preferences.get("AlwaysOnTop");
+		if (prefAlwaysOnTop == null) {
+			prefAlwaysOnTop = "no";
+		}
+		CheckboxMenuItem menuAlwaysOnTop = new CheckboxMenuItem("Always on top", prefAlwaysOnTop.equals("yes"));
 		menuAlwaysOnTop.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -271,7 +275,8 @@ public class appletviewer
 		Preferences.load();
 
 		// set always on top
-		if (Preferences.get("AlwaysOnTop").equals("yes")) {
+		String alwaysOnTop = Preferences.get("AlwaysOnTop");
+		if (alwaysOnTop != null && alwaysOnTop.equals("yes")) {
 			setAlwaysOnTop(true);
 		}
 
