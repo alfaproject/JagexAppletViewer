@@ -11,12 +11,12 @@ final class DialogDebug
 		implements WindowListener
 {
 	private static final DialogDebug INSTANCE = new DialogDebug();
+	private static String _title;
 
 	private PrintStream _printStream = new PrintStream(this, true);
 	private StringBuffer _buffer = new StringBuffer(512);
 	private Frame _frame;
 	private TextArea _textArea = new TextArea();
-	private String _title;
 
 	private DialogDebug()
 	{
